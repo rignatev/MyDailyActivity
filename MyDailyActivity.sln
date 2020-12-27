@@ -14,6 +14,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{09FCAB8B
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Data.Contracts", "Data.Contracts\Data.Contracts.csproj", "{D0494471-25CD-42B8-B4BD-4792880F0B3B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared.Infrastructure.UnitTests", "Shared.Infrastructure.UnitTests\Shared.Infrastructure.UnitTests.csproj", "{35723C42-B53F-4DA4-A454-18457035C81F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -44,5 +46,12 @@ Global
 		{D0494471-25CD-42B8-B4BD-4792880F0B3B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D0494471-25CD-42B8-B4BD-4792880F0B3B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D0494471-25CD-42B8-B4BD-4792880F0B3B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{35723C42-B53F-4DA4-A454-18457035C81F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{35723C42-B53F-4DA4-A454-18457035C81F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{35723C42-B53F-4DA4-A454-18457035C81F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{35723C42-B53F-4DA4-A454-18457035C81F}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{35723C42-B53F-4DA4-A454-18457035C81F} = {09FCAB8B-DD66-4B4B-A549-134731FC90B8}
 	EndGlobalSection
 EndGlobal
