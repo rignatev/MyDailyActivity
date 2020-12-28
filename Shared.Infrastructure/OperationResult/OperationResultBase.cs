@@ -3,7 +3,7 @@ using System;
 namespace Shared.Infrastructure.OperationResult
 {
     public abstract class OperationResultBase<TResult, TError> : IOperationResult<TResult, TError>
-        where TResult : IOperationResult<TResult, TError>, new()
+        where TResult : OperationResultBase<TResult, TError>, new()
         where TError : IOperationError
     {
         /// <inheritdoc />
@@ -26,7 +26,7 @@ namespace Shared.Infrastructure.OperationResult
         where TResult : OperationResultBase<TResult, TError, TResultValue>, new()
         where TError : IOperationError
     {
-        public TResultValue Value { get; private init; }
+        public TResultValue Value { get; init; }
 
         /// <inheritdoc />
         public bool Success => !this.Failure;
@@ -35,7 +35,7 @@ namespace Shared.Infrastructure.OperationResult
         public bool Failure => this.Error != null;
 
         /// <inheritdoc />
-        public TError Error { get; init; }
+        public TError Error { get; private init; }
 
         static public TResult Ok(TResultValue value) =>
             new() { Value = value };
@@ -43,7 +43,7 @@ namespace Shared.Infrastructure.OperationResult
         static public TResult Fail(TError error) =>
             new() { Error = error };
 
-        public TResultValue GetValueOrThrow()
+        public virtual TResultValue GetValueOrThrow()
         {
             if (this.Success && this.Value != null)
             {

@@ -1,6 +1,6 @@
 namespace Shared.Infrastructure.OperationResult
 {
-    public interface IOperationResult<TResult, TError>
+    public interface IOperationResult<TResult, out TError>
         where TResult : IOperationResult<TResult, TError>, new()
         where TError : IOperationError
     {
@@ -8,6 +8,6 @@ namespace Shared.Infrastructure.OperationResult
 
         bool Failure { get; }
 
-        TError Error { get; init; }
+        TError Error { get; }
     }
 }
