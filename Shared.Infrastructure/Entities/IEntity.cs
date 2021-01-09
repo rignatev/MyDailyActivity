@@ -2,17 +2,12 @@
 
 namespace Shared.Infrastructure.Entities
 {
-    public interface IEntity
+    public interface IEntity<TIdType>
     {
-        object Id { get; }
+        TIdType Id { get; set; }
 
-        DateTime CreatedDate { get; set; }
+        DateTime CreatedDateTimeUtc { get; set; }
 
-        DateTime? ModifiedDate { get; set; }
-    }
-
-    public interface IEntity<TIdType> : IEntity
-    {
-        new TIdType Id { get; set; }
+        DateTime? ModifiedDateTimeUtc { get; set; }
     }
 }

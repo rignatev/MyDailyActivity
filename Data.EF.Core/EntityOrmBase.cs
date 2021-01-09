@@ -1,8 +1,8 @@
 using System;
 
-namespace Shared.Infrastructure.Entities
+namespace Data.EF.Core
 {
-    public class EntityBase<TIdType> : IEntity<TIdType>
+    public class EntityOrmBase<TIdType> : IEntityOrm<TIdType>
     {
         /// <inheritdoc />
         public TIdType Id { get; set; }
