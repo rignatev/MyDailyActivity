@@ -5,10 +5,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <Folder Include="OperationScopes" />
-    </ItemGroup>
-
-    <ItemGroup>
+      <ProjectReference Include="..\Data.Contracts\Data.Contracts.csproj" />
       <ProjectReference Include="..\Shared.Infrastructure\Shared.Infrastructure.csproj" />
     </ItemGroup>
 

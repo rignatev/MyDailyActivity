@@ -1,11 +1,14 @@
 using System;
 
+using Data.Contracts;
+
 namespace Data.EF.Core
 {
-    public class EntityOrmBase<TIdType> : IEntityOrm<TIdType>
+    public class EntityOrmBase<TEntityIdType> : IEntityOrm<TEntityIdType>
+        where TEntityIdType : IComparable<TEntityIdType>, IEquatable<TEntityIdType>
     {
         /// <inheritdoc />
-        public TIdType Id { get; set; }
+        public TEntityIdType Id { get; set; }
 
         /// <inheritdoc />
         public DateTime CreatedDateTimeUtc { get; set; }

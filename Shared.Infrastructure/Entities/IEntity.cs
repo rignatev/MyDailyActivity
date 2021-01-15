@@ -2,9 +2,10 @@
 
 namespace Shared.Infrastructure.Entities
 {
-    public interface IEntity<TIdType>
+    public interface IEntity<TEntityIdType>
+        where TEntityIdType : IComparable<TEntityIdType>, IEquatable<TEntityIdType>
     {
-        TIdType Id { get; set; }
+        TEntityIdType Id { get; set; }
 
         DateTime CreatedDateTimeUtc { get; set; }
 

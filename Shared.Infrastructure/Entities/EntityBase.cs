@@ -2,10 +2,11 @@ using System;
 
 namespace Shared.Infrastructure.Entities
 {
-    public class EntityBase<TIdType> : IEntity<TIdType>
+    public class EntityBase<TEntityIdType> : IEntity<TEntityIdType>
+        where TEntityIdType : IComparable<TEntityIdType>, IEquatable<TEntityIdType>
     {
         /// <inheritdoc />
-        public TIdType Id { get; set; }
+        public TEntityIdType Id { get; set; }
 
         /// <inheritdoc />
         public DateTime CreatedDateTimeUtc { get; set; }

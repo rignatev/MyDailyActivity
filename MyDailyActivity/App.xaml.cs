@@ -1,6 +1,15 @@
+using System;
+
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
+
+using Data.EF.Core.Contexts;
+
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+
 using MyDailyActivity.ViewModels;
 using MyDailyActivity.Views;
 
@@ -17,6 +26,15 @@ namespace MyDailyActivity
         {
             if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
             {
+                IConfiguration configuration = new ConfigurationBuilder()
+                    .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
+                    .AddJsonFile("appsettings.json")
+                    .Build();
+                
+                var serviceCollection = new ServiceCollection();
+
+                ConfigureServices(serviceCollection, configuration);
+                
                 desktop.MainWindow = new MainWindow
                 {
                     DataContext = new MainWindowViewModel(),
@@ -24,6 +42,13 @@ namespace MyDailyActivity
             }
 
             base.OnFrameworkInitializationCompleted();
+        }
+
+        static private void ConfigureServices(IServiceCollection serviceCollection, IConfiguration configuration)
+        {
+            serviceCollection
+                .AddEntityFrameworkSqlite()
+                .AddDbContext<AppDbContext, AppDbContext>(options => options.UseSqlite(configuration.GetConnectionString("Sqlite")));
         }
     }
 }
