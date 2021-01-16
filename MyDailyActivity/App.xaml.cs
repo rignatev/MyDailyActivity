@@ -4,9 +4,8 @@ using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 
-using Data.Shared.Contexts;
+using Data.Shared;
 
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -43,9 +42,7 @@ namespace MyDailyActivity
 
         static private void ConfigureServices(IServiceCollection serviceCollection, IConfiguration configuration)
         {
-            serviceCollection
-                .AddEntityFrameworkSqlite()
-                .AddDbContext<AppDbContext, AppDbContext>(options => options.UseSqlite(configuration.GetConnectionString("Sqlite")));
+            DataServicesConfigurator.ConfigureServices(serviceCollection, configuration.GetConnectionString("Sqlite"));
         }
     }
 }
