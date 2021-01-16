@@ -2,15 +2,15 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-using Data.Contracts;
 using Data.Contracts.EntityServices;
 using Data.EF.Core.OperationScopes;
 using Data.EF.Core.Utils;
+using Data.Shared;
+
+using Infrastructure.Shared.OperationResult;
 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
-
-using Shared.Infrastructure.OperationResult;
 
 namespace Data.EF.Core
 {

@@ -1,3 +1,5 @@
+using Data.Contracts.Projects;
+
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Data.EF.Core.Projects

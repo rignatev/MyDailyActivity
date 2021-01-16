@@ -1,6 +1,6 @@
 using System;
 
-namespace Shared.Infrastructure.OperationResult
+namespace Infrastructure.Shared.OperationResult
 {
     public class OperationError : OperationErrorBase
     {

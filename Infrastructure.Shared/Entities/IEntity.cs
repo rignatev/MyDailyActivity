@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Shared.Infrastructure.Entities
+namespace Infrastructure.Shared.Entities
 {
     public interface IEntity<TEntityIdType>
         where TEntityIdType : IComparable<TEntityIdType>, IEquatable<TEntityIdType>

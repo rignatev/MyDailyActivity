@@ -1,6 +1,6 @@
-using Shared.Infrastructure.Entities;
+using Infrastructure.Shared.Entities;
 
-namespace Shared.Contracts.Models
+namespace Contracts.Shared.Models
 {
     public class TaskModel : EntityBase<int>
     {

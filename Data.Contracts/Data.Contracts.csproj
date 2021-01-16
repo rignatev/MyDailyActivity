@@ -5,11 +5,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Shared.Infrastructure\Shared.Infrastructure.csproj" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.1" />
+      <ProjectReference Include="..\Data.Shared\Data.Shared.csproj" />
+      <ProjectReference Include="..\Infrastructure.Shared\Infrastructure.Shared.csproj" />
     </ItemGroup>
 
 </Project>

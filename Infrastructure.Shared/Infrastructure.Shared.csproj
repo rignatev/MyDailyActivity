@@ -2,10 +2,8 @@
 
     <PropertyGroup>
         <TargetFramework>net5.0</TargetFramework>
+        <AssemblyName>Infrastructure.Shared</AssemblyName>
+        <RootNamespace>Infrastructure.Shared</RootNamespace>
     </PropertyGroup>
-
-    <ItemGroup>
-      <ProjectReference Include="..\Shared.Infrastructure\Shared.Infrastructure.csproj" />
-    </ItemGroup>
 
 </Project>

@@ -1,8 +1,8 @@
-using Data.EF.Core.Tasks;
+using Infrastructure.Shared.Entities;
 
-namespace Data.EF.Core.Projects
+namespace Contracts.Shared.Models
 {
-    public class ProjectOrm : EntityOrmBase<int>
+    public class ProjectModel : EntityBase<int>
     {
         public string Name { get; set; }
 

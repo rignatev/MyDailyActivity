@@ -1,4 +1,4 @@
-namespace Shared.Infrastructure.OperationResult
+namespace Infrastructure.Shared.OperationResult
 {
     public interface IOperationResult<TResult, out TError>
         where TResult : IOperationResult<TResult, TError>, new()

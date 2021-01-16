@@ -1,8 +1,6 @@
 using System;
 
-using Data.Contracts;
-
-namespace Data.EF.Core
+namespace Data.Shared
 {
     public class EntityOrmBase<TEntityIdType> : IEntityOrm<TEntityIdType>
         where TEntityIdType : IComparable<TEntityIdType>, IEquatable<TEntityIdType>

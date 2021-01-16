@@ -1,6 +1,6 @@
 using System;
 
-namespace Shared.Infrastructure.Entities
+namespace Infrastructure.Shared.Entities
 {
     public class EntityBase<TEntityIdType> : IEntity<TEntityIdType>
         where TEntityIdType : IComparable<TEntityIdType>, IEquatable<TEntityIdType>

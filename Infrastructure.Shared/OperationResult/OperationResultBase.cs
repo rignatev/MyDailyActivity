@@ -1,6 +1,6 @@
 using System;
 
-namespace Shared.Infrastructure.OperationResult
+namespace Infrastructure.Shared.OperationResult
 {
     public abstract class OperationResultBase<TResult, TError> : IOperationResult<TResult, TError>
         where TResult : OperationResultBase<TResult, TError>, new()

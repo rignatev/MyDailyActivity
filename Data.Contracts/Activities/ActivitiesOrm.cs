@@ -1,9 +1,10 @@
 using System;
 
-using Data.EF.Core.Projects;
-using Data.EF.Core.Tasks;
+using Data.Contracts.Projects;
+using Data.Contracts.Tasks;
+using Data.Shared;
 
-namespace Data.EF.Core.Activities
+namespace Data.Contracts.Activities
 {
     public class ActivitiesOrm : EntityOrmBase<int>
     {

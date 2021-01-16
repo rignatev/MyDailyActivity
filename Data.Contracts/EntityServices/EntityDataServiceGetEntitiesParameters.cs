@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 
+using Data.Shared;
+
 namespace Data.Contracts.EntityServices
 {
     public class EntityDataServiceGetEntitiesParameters<TEntity, TEntityIdType>

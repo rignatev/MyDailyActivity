@@ -2,9 +2,9 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyDailyActivity", "MyDailyActivity\MyDailyActivity.csproj", "{E6BB8C07-A772-4066-B277-CBB4165016F3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared.Infrastructure", "Shared.Infrastructure\Shared.Infrastructure.csproj", "{4ACAE28F-DD48-4A32-BE70-8438E0438A8D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infrastructure.Shared", "Infrastructure.Shared\Infrastructure.Shared.csproj", "{4ACAE28F-DD48-4A32-BE70-8438E0438A8D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared.Contracts", "Shared.Contracts\Shared.Contracts.csproj", "{A639734F-60A1-4F62-A2F6-093E7D9DEAE0}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Contracts.Shared", "Contracts.Shared\Contracts.Shared.csproj", "{A639734F-60A1-4F62-A2F6-093E7D9DEAE0}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Services", "Services\Services.csproj", "{3D249F71-1BBB-4B5A-B929-6ECF7AA6A40D}"
 EndProject
@@ -21,6 +21,10 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Data.Migrations", "Data.Migrations\Data.Migrations.csproj", "{9B205B75-12EF-4770-9065-083190B1EAC9}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Data.UnitTests", "Data.UnitTests\Data.UnitTests.csproj", "{EC071DE0-A54C-4D14-BE05-E86A0D99681F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Data.Shared", "Data.Shared\Data.Shared.csproj", "{CE9452DC-8CE4-4CEB-B0EC-C45506967729}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Data", "Data", "{929115C0-B592-4F09-93AC-624620CFE2B8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -68,9 +72,17 @@ Global
 		{EC071DE0-A54C-4D14-BE05-E86A0D99681F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EC071DE0-A54C-4D14-BE05-E86A0D99681F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EC071DE0-A54C-4D14-BE05-E86A0D99681F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CE9452DC-8CE4-4CEB-B0EC-C45506967729}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CE9452DC-8CE4-4CEB-B0EC-C45506967729}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CE9452DC-8CE4-4CEB-B0EC-C45506967729}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CE9452DC-8CE4-4CEB-B0EC-C45506967729}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{35723C42-B53F-4DA4-A454-18457035C81F} = {09FCAB8B-DD66-4B4B-A549-134731FC90B8}
 		{EC071DE0-A54C-4D14-BE05-E86A0D99681F} = {09FCAB8B-DD66-4B4B-A549-134731FC90B8}
+		{D0494471-25CD-42B8-B4BD-4792880F0B3B} = {929115C0-B592-4F09-93AC-624620CFE2B8}
+		{48439CCF-7C1C-47CD-9138-378FF922840B} = {929115C0-B592-4F09-93AC-624620CFE2B8}
+		{9B205B75-12EF-4770-9065-083190B1EAC9} = {929115C0-B592-4F09-93AC-624620CFE2B8}
+		{CE9452DC-8CE4-4CEB-B0EC-C45506967729} = {929115C0-B592-4F09-93AC-624620CFE2B8}
 	EndGlobalSection
 EndGlobal

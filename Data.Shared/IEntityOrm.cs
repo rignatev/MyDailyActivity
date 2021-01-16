@@ -1,8 +1,8 @@
 using System;
 
-using Shared.Infrastructure.Entities;
+using Infrastructure.Shared.Entities;
 
-namespace Data.Contracts
+namespace Data.Shared
 {
     public interface IEntityOrm<TEntityIdType> : IEntity<TEntityIdType>
         where TEntityIdType : IComparable<TEntityIdType>, IEquatable<TEntityIdType>

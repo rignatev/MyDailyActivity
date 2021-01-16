@@ -4,7 +4,7 @@ using FluentAssertions;
 using FluentAssertions.Common;
 using FluentAssertions.Execution;
 
-using Shared.Infrastructure.OperationResult;
+using Infrastructure.Shared.OperationResult;
 
 using Xunit;
 

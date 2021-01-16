@@ -1,4 +1,4 @@
-namespace Shared.Infrastructure.OperationResult
+namespace Infrastructure.Shared.OperationResult
 {
     public class OperationResult : OperationResultBase<OperationResult, OperationError>
     {

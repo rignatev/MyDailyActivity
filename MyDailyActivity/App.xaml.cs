@@ -4,7 +4,7 @@ using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 
-using Data.EF.Core.Contexts;
+using Data.Shared.Contexts;
 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -24,21 +24,18 @@ namespace MyDailyActivity
 
         public override void OnFrameworkInitializationCompleted()
         {
-            if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+            if (this.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
             {
                 IConfiguration configuration = new ConfigurationBuilder()
                     .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
                     .AddJsonFile("appsettings.json")
                     .Build();
-                
+
                 var serviceCollection = new ServiceCollection();
 
                 ConfigureServices(serviceCollection, configuration);
-                
-                desktop.MainWindow = new MainWindow
-                {
-                    DataContext = new MainWindowViewModel(),
-                };
+
+                desktop.MainWindow = new MainWindow { DataContext = new MainWindowViewModel() };
             }
 
             base.OnFrameworkInitializationCompleted();
