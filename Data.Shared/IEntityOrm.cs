@@ -4,8 +4,8 @@ using Infrastructure.Shared.Entities;
 
 namespace Data.Shared
 {
-    public interface IEntityOrm<TEntityIdType> : IEntity<TEntityIdType>
-        where TEntityIdType : IComparable<TEntityIdType>, IEquatable<TEntityIdType>
+    public interface IEntityOrm<TEntityOrmIdType> : IEntity<TEntityOrmIdType>
+        where TEntityOrmIdType : IComparable<TEntityOrmIdType>, IEquatable<TEntityOrmIdType>
     {
     }
 }

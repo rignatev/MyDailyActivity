@@ -1,14 +1,13 @@
 using System;
 using System.Collections.Generic;
 
-using Data.Shared;
-
+using Infrastructure.Shared.Entities;
 using Infrastructure.Shared.OperationResult;
 
-namespace Data.Contracts.EntityServices
+namespace Services.Contracts.EntityServices
 {
-    public interface IEntityDataService<TEntity, TEntityIdType>
-        where TEntity : class, IEntityOrm<TEntityIdType>, new()
+    public interface IEntityService<TEntity, TEntityIdType>
+        where TEntity : class, IEntity<TEntityIdType>, new()
         where TEntityIdType : IComparable<TEntityIdType>, IEquatable<TEntityIdType>
     {
         OperationResult<TEntityIdType> Create(TEntity entity);
@@ -21,6 +20,6 @@ namespace Data.Contracts.EntityServices
 
         OperationResult<TEntity> GetEntity(TEntityIdType id, bool includeRelated);
 
-        OperationResult<IEnumerable<TEntity>> GetEntities(EntityDataServiceGetEntitiesParameters<TEntity, TEntityIdType> parameters);
+        OperationResult<IEnumerable<TEntity>> GetEntities(EntityServiceGetEntitiesParameters<TEntity, TEntityIdType> parameters);
     }
 }

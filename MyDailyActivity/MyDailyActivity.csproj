@@ -28,6 +28,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Data.Shared\Data.Shared.csproj" />
+    <ProjectReference Include="..\Data.EF.Core\Data.EF.Core.csproj" />
   </ItemGroup>
 </Project>

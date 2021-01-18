@@ -2,11 +2,11 @@ using System;
 
 namespace Data.Shared
 {
-    public class EntityOrmBase<TEntityIdType> : IEntityOrm<TEntityIdType>
-        where TEntityIdType : IComparable<TEntityIdType>, IEquatable<TEntityIdType>
+    public class EntityOrmBase<TEntityOrmIdType> : IEntityOrm<TEntityOrmIdType>
+        where TEntityOrmIdType : IComparable<TEntityOrmIdType>, IEquatable<TEntityOrmIdType>
     {
         /// <inheritdoc />
-        public TEntityIdType Id { get; set; }
+        public TEntityOrmIdType Id { get; set; }
 
         /// <inheritdoc />
         public DateTime CreatedDateTimeUtc { get; set; }

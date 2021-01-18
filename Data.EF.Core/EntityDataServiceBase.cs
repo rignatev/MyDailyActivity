@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-using Data.Contracts.EntityServices;
+using Data.Contracts.EntityDataServices;
 using Data.EF.Core.OperationScopes;
 using Data.EF.Core.Utils;
 using Data.Shared;
@@ -14,9 +14,9 @@ using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 namespace Data.EF.Core
 {
-    public abstract class EntityDataServiceBase<TEntity, TEntityIdType, TDbContext> : IEntityDataService<TEntity, TEntityIdType>
-        where TEntity : class, IEntityOrm<TEntityIdType>, new()
-        where TEntityIdType : IComparable<TEntityIdType>, IEquatable<TEntityIdType>
+    public abstract class EntityDataServiceBase<TEntityOrm, TEntityOrmIdType, TDbContext> : IEntityDataService<TEntityOrm, TEntityOrmIdType>
+        where TEntityOrm : class, IEntityOrm<TEntityOrmIdType>, new()
+        where TEntityOrmIdType : IComparable<TEntityOrmIdType>, IEquatable<TEntityOrmIdType>
         where TDbContext : DbContext
     {
         private readonly IServiceProvider _serviceProvider;
@@ -25,32 +25,32 @@ namespace Data.EF.Core
             _serviceProvider = serviceProvider;
 
         /// <inheritdoc />
-        public OperationResult<TEntityIdType> Create(TEntity entity)
+        public OperationResult<TEntityOrmIdType> Create(TEntityOrm entity)
         {
-            OperationResult<TEntityIdType> result;
+            OperationResult<TEntityOrmIdType> result;
 
             try
             {
                 using ModificationScope<TDbContext> modificationScope = CreateModificationScope();
 
-                DbSet<TEntity> entityDbSet = GetEntityDbSet(modificationScope);
-                EntityEntry<TEntity> updateResult = entityDbSet.Update(entity);
+                DbSet<TEntityOrm> entityDbSet = GetEntityDbSet(modificationScope);
+                EntityEntry<TEntityOrm> updateResult = entityDbSet.Update(entity);
 
                 modificationScope.SaveChangesAndCommit();
 
-                result = OperationResult<TEntityIdType>.Ok(updateResult.Entity.Id);
+                result = OperationResult<TEntityOrmIdType>.Ok(updateResult.Entity.Id);
             }
             catch (Exception exception)
             {
                 var error = new OperationError(exception);
-                result = OperationResult<TEntityIdType>.Fail(error);
+                result = OperationResult<TEntityOrmIdType>.Fail(error);
             }
 
             return result;
         }
 
         /// <inheritdoc />
-        public OperationResult Update(TEntity entity)
+        public OperationResult Update(TEntityOrm entity)
         {
             OperationResult result;
 
@@ -58,7 +58,7 @@ namespace Data.EF.Core
             {
                 using ModificationScope<TDbContext> modificationScope = CreateModificationScope();
 
-                DbSet<TEntity> entityDbSet = GetEntityDbSet(modificationScope);
+                DbSet<TEntityOrm> entityDbSet = GetEntityDbSet(modificationScope);
                 entityDbSet.Update(entity);
 
                 modificationScope.SaveChangesAndCommit();
@@ -75,7 +75,7 @@ namespace Data.EF.Core
         }
 
         /// <inheritdoc />
-        public OperationResult Delete(TEntityIdType id)
+        public OperationResult Delete(TEntityOrmIdType id)
         {
             OperationResult result;
 
@@ -83,8 +83,8 @@ namespace Data.EF.Core
             {
                 using ModificationScope<TDbContext> modificationScope = CreateModificationScope();
 
-                DbSet<TEntity> entityDbSet = GetEntityDbSet(modificationScope);
-                entityDbSet.Remove(new TEntity { Id = id });
+                DbSet<TEntityOrm> entityDbSet = GetEntityDbSet(modificationScope);
+                entityDbSet.Remove(new TEntityOrm { Id = id });
 
                 modificationScope.SaveChangesAndCommit();
 
@@ -100,7 +100,7 @@ namespace Data.EF.Core
         }
 
         /// <inheritdoc />
-        public OperationResult DeleteRange(IEnumerable<TEntityIdType> ids)
+        public OperationResult DeleteRange(IEnumerable<TEntityOrmIdType> ids)
         {
             OperationResult result;
 
@@ -111,11 +111,11 @@ namespace Data.EF.Core
                     throw new ArgumentNullException($"Argument {nameof(ids)} is null.");
                 }
 
-                IEnumerable<TEntity> entities = ids.Select(id => new TEntity { Id = id });
+                IEnumerable<TEntityOrm> entities = ids.Select(id => new TEntityOrm { Id = id });
 
                 using ModificationScope<TDbContext> modificationScope = CreateModificationScope();
 
-                DbSet<TEntity> entityDbSet = GetEntityDbSet(modificationScope);
+                DbSet<TEntityOrm> entityDbSet = GetEntityDbSet(modificationScope);
                 entityDbSet.RemoveRange(entities);
 
                 modificationScope.SaveChangesAndCommit();
@@ -132,42 +132,42 @@ namespace Data.EF.Core
         }
 
         /// <inheritdoc />
-        public OperationResult<TEntity> GetEntity(TEntityIdType id, bool includeRelated = false)
+        public OperationResult<TEntityOrm> GetEntity(TEntityOrmIdType id, bool includeRelated = false)
         {
-            OperationResult<TEntity> result;
+            OperationResult<TEntityOrm> result;
 
             try
             {
                 using ReaderScope<TDbContext> readerScope = CreateReaderScope();
 
-                DbSet<TEntity> entityDbSet = GetEntityDbSet(readerScope);
+                DbSet<TEntityOrm> entityDbSet = GetEntityDbSet(readerScope);
 
-                TEntity entity = includeRelated
+                TEntityOrm entity = includeRelated
                     ? entityDbSet.IncludeAll().FirstOrDefault(x => x.Id.Equals(id))
                     : entityDbSet.Find(id);
 
-                result = OperationResult<TEntity>.Ok(entity);
+                result = OperationResult<TEntityOrm>.Ok(entity);
             }
             catch (Exception exception)
             {
                 var error = new OperationError(exception);
-                result = OperationResult<TEntity>.Fail(error);
+                result = OperationResult<TEntityOrm>.Fail(error);
             }
 
             return result;
         }
 
         /// <inheritdoc />
-        public OperationResult<IEnumerable<TEntity>> GetEntities(EntityDataServiceGetEntitiesParameters<TEntity, TEntityIdType> parameters)
+        public OperationResult<IEnumerable<TEntityOrm>> GetEntities(EntityDataServiceGetEntitiesParameters<TEntityOrm, TEntityOrmIdType> parameters)
         {
-            OperationResult<IEnumerable<TEntity>> result;
+            OperationResult<IEnumerable<TEntityOrm>> result;
 
             try
             {
                 using ReaderScope<TDbContext> readerScope = CreateReaderScope();
 
-                DbSet<TEntity> entityDbSet = GetEntityDbSet(readerScope);
-                IQueryable<TEntity> query = entityDbSet.AsQueryable();
+                DbSet<TEntityOrm> entityDbSet = GetEntityDbSet(readerScope);
+                IQueryable<TEntityOrm> query = entityDbSet.AsQueryable();
 
                 if (parameters.Ids != null)
                 {
@@ -196,19 +196,19 @@ namespace Data.EF.Core
                     query = query.IncludeAll(readerScope.DbContext);
                 }
 
-                result = OperationResult<IEnumerable<TEntity>>.Ok(query.AsEnumerable());
+                result = OperationResult<IEnumerable<TEntityOrm>>.Ok(query.AsEnumerable());
             }
             catch (Exception exception)
             {
                 var error = new OperationError(exception);
-                result = OperationResult<IEnumerable<TEntity>>.Fail(error);
+                result = OperationResult<IEnumerable<TEntityOrm>>.Fail(error);
             }
 
             return result;
         }
 
-        static private DbSet<TEntity> GetEntityDbSet(OperationScopeBase<TDbContext> scope) =>
-            scope.DbContext.Set<TEntity>();
+        static private DbSet<TEntityOrm> GetEntityDbSet(OperationScopeBase<TDbContext> scope) =>
+            scope.DbContext.Set<TEntityOrm>();
 
         private ReaderScope<TDbContext> CreateReaderScope() =>
             new(_serviceProvider);

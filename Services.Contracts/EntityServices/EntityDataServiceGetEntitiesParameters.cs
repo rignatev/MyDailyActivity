@@ -2,12 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 
-using Data.Shared;
+using Infrastructure.Shared.Entities;
 
-namespace Data.Contracts.EntityServices
+namespace Services.Contracts.EntityServices
 {
-    public class EntityDataServiceGetEntitiesParameters<TEntity, TEntityIdType>
-        where TEntity : class, IEntityOrm<TEntityIdType>, new()
+    public class EntityServiceGetEntitiesParameters<TEntity, TEntityIdType>
+        where TEntity : class, IEntity<TEntityIdType>, new()
         where TEntityIdType : IComparable<TEntityIdType>, IEquatable<TEntityIdType>
     {
         public IEnumerable<TEntityIdType> Ids { get; set; }

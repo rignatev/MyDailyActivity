@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 
-namespace Data.Shared.Contexts
+namespace Data.EF.Core.Contexts
 {
     public class AppDbContext : DbContext
     {
