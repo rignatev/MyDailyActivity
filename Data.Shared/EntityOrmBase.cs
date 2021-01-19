@@ -2,7 +2,7 @@ using System;
 
 namespace Data.Shared
 {
-    public class EntityOrmBase<TEntityOrmIdType> : IEntityOrm<TEntityOrmIdType>
+    public abstract class EntityOrmBase<TEntityOrmIdType> : IEntityOrm<TEntityOrmIdType>
         where TEntityOrmIdType : IComparable<TEntityOrmIdType>, IEquatable<TEntityOrmIdType>
     {
         /// <inheritdoc />

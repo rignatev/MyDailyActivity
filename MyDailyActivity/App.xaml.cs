@@ -4,13 +4,13 @@ using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 
-using Data.EF.Core;
-
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 using MyDailyActivity.ViewModels;
 using MyDailyActivity.Views;
+
+using Services;
 
 namespace MyDailyActivity
 {
@@ -32,17 +32,12 @@ namespace MyDailyActivity
 
                 var serviceCollection = new ServiceCollection();
 
-                ConfigureServices(serviceCollection, configuration);
+                ServicesConfigurator.ConfigureServices(serviceCollection, configuration.GetConnectionString("Sqlite"));
 
                 desktop.MainWindow = new MainWindow { DataContext = new MainWindowViewModel() };
             }
 
             base.OnFrameworkInitializationCompleted();
-        }
-
-        static private void ConfigureServices(IServiceCollection serviceCollection, IConfiguration configuration)
-        {
-            DataServicesConfigurator.ConfigureServices(serviceCollection, configuration.GetConnectionString("Sqlite"));
         }
     }
 }

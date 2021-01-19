@@ -1,7 +1,4 @@
-using System;
-
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Data.EF.Core.OperationScopes
 {
@@ -11,10 +8,9 @@ namespace Data.EF.Core.OperationScopes
         private bool _disposed;
 
         /// <inheritdoc />
-        public ReaderScope(IServiceProvider serviceProvider) : base(serviceProvider)
+        public ReaderScope(TDbContext dbContext) : base(dbContext)
         {
             ScopeLock.EnterReadLock();
-            this.DbContext = ServiceProvider.GetRequiredService<TDbContext>();
             this.DbContext.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
         }
 

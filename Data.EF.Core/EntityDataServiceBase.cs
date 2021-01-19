@@ -11,6 +11,7 @@ using Infrastructure.Shared.OperationResult;
 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Data.EF.Core
 {
@@ -211,9 +212,9 @@ namespace Data.EF.Core
             scope.DbContext.Set<TEntityOrm>();
 
         private ReaderScope<TDbContext> CreateReaderScope() =>
-            new(_serviceProvider);
+            _serviceProvider.GetRequiredService<ReaderScope<TDbContext>>();
 
         private ModificationScope<TDbContext> CreateModificationScope() =>
-            new(_serviceProvider);
+            _serviceProvider.GetRequiredService<ModificationScope<TDbContext>>();
     }
 }

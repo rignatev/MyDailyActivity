@@ -1,5 +1,3 @@
-using System;
-
 using Contracts.Shared.Models;
 
 using Data.Contracts.Tasks;
@@ -11,7 +9,7 @@ namespace Services.Tasks
     public class TaskService : EntityServiceBase<TaskModel, int, ITaskDataService, TaskOrm, int>, ITaskService
     {
         /// <inheritdoc />
-        public TaskService(IServiceProvider serviceProvider) : base(serviceProvider)
+        public TaskService(ITaskDataService taskDataService) : base(taskDataService)
         {
         }
 

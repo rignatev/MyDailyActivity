@@ -1,8 +1,5 @@
-using System;
-
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Data.EF.Core.OperationScopes
 {
@@ -13,10 +10,9 @@ namespace Data.EF.Core.OperationScopes
         private bool _disposed;
 
         /// <inheritdoc />
-        public ModificationScope(IServiceProvider serviceProvider) : base(serviceProvider)
+        public ModificationScope(TDbContext dbContext) : base(dbContext)
         {
             ScopeLock.EnterWriteLock();
-            this.DbContext = ServiceProvider.GetRequiredService<TDbContext>();
             _transaction = this.DbContext.Database.BeginTransaction();
         }
 

@@ -9,8 +9,6 @@ using Data.Shared;
 using Infrastructure.Shared.Entities;
 using Infrastructure.Shared.OperationResult;
 
-using Microsoft.Extensions.DependencyInjection;
-
 using Services.Contracts.EntityServices;
 
 namespace Services
@@ -23,15 +21,10 @@ namespace Services
         where TEntityOrm : class, IEntityOrm<TEntityOrmIdType>, new()
         where TEntityOrmIdType : IComparable<TEntityOrmIdType>, IEquatable<TEntityOrmIdType>
     {
-        private readonly IServiceProvider _serviceProvider;
-
         protected TEntityDataService EntityDataService { get; }
 
-        protected EntityServiceBase(IServiceProvider serviceProvider)
-        {
-            _serviceProvider = serviceProvider;
-            this.EntityDataService = _serviceProvider.GetRequiredService<TEntityDataService>();
-        }
+        protected EntityServiceBase(TEntityDataService entityDataService) =>
+            this.EntityDataService = entityDataService;
 
         /// <inheritdoc />
         public OperationResult<TEntityIdType> Create(TEntity entity)
@@ -107,9 +100,6 @@ namespace Services
         protected abstract TEntityOrmIdType ConvertToEntityOrmId(TEntityIdType entityIdType);
 
         protected abstract TEntityOrm ConvertToEntityOrm(TEntity entity);
-
-        protected TService GetService<TService>() =>
-            _serviceProvider.GetRequiredService<TService>();
 
         static private Expression<Func<TEntityOrm, object>> ConvertToEntityOrmProperty(Expression<Func<TEntity, object>> entityProperty) =>
             // TODO: Implement convertion

@@ -2,7 +2,6 @@ using System;
 using System.Threading;
 
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Data.EF.Core.OperationScopes
 {
@@ -10,17 +9,12 @@ namespace Data.EF.Core.OperationScopes
         where TDbContext : DbContext
     {
         static protected readonly ReaderWriterLockSlim ScopeLock = new();
-        protected readonly IServiceProvider ServiceProvider;
         private bool _disposed;
 
-        public TDbContext DbContext { get; protected init; }
+        public TDbContext DbContext { get; }
 
-        protected OperationScopeBase(IServiceProvider serviceProvider)
-        {
-            using IServiceScope serviceScope = serviceProvider.CreateScope();
-
-            ServiceProvider = serviceScope.ServiceProvider;
-        }
+        protected OperationScopeBase(TDbContext dbContext) =>
+            this.DbContext = dbContext;
 
         /// <inheritdoc />
         public void Dispose() =>

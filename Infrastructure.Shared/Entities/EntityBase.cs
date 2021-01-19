@@ -2,7 +2,7 @@ using System;
 
 namespace Infrastructure.Shared.Entities
 {
-    public class EntityBase<TEntityIdType> : IEntity<TEntityIdType>
+    public abstract class EntityBase<TEntityIdType> : IEntity<TEntityIdType>
         where TEntityIdType : IComparable<TEntityIdType>, IEquatable<TEntityIdType>
     {
         /// <inheritdoc />
