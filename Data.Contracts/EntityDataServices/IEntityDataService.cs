@@ -1,27 +1,25 @@
 using System;
 using System.Collections.Generic;
 
-using Data.Shared;
-
+using Infrastructure.Shared.Entities;
 using Infrastructure.Shared.OperationResult;
 
 namespace Data.Contracts.EntityDataServices
 {
-    public interface IEntityDataService<TEntityOrm, TEntityOrmIdType>
-        where TEntityOrm : class, IEntityOrm<TEntityOrmIdType>, new()
-        where TEntityOrmIdType : IComparable<TEntityOrmIdType>, IEquatable<TEntityOrmIdType>
+    public interface IEntityDataService<TEntity, TEntityIdType>
+        where TEntity : class, IEntity<TEntityIdType>, new()
+        where TEntityIdType : IComparable<TEntityIdType>, IEquatable<TEntityIdType>
     {
-        OperationResult<TEntityOrmIdType> Create(TEntityOrm entity);
+        OperationResult<TEntityIdType> Create(TEntity entity);
 
-        OperationResult Update(TEntityOrm entity);
+        OperationResult Update(TEntity entity);
 
-        OperationResult Delete(TEntityOrmIdType id);
+        OperationResult Delete(TEntityIdType id);
 
-        OperationResult DeleteRange(IEnumerable<TEntityOrmIdType> ids);
+        OperationResult DeleteRange(IEnumerable<TEntityIdType> ids);
 
-        OperationResult<TEntityOrm> GetEntity(TEntityOrmIdType id, bool includeRelated);
+        OperationResult<TEntity> GetEntity(TEntityIdType id, bool includeRelated);
 
-        OperationResult<IEnumerable<TEntityOrm>> GetEntities(
-            EntityDataServiceGetEntitiesParameters<TEntityOrm, TEntityOrmIdType> parameters);
+        OperationResult<IEnumerable<TEntity>> GetEntities(EntityDataServiceGetEntitiesParameters<TEntity, TEntityIdType> parameters);
     }
 }

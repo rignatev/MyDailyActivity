@@ -5,7 +5,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Data.Contracts\Data.Contracts.csproj" />
       <ProjectReference Include="..\Data.EF.Core\Data.EF.Core.csproj" />
       <ProjectReference Include="..\Services.Contracts\Services.Contracts.csproj" />
     </ItemGroup>

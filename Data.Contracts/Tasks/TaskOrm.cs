@@ -1,4 +1,4 @@
-using Data.Shared;
+using Data.Contracts.EntityOrm;
 
 namespace Data.Contracts.Tasks
 {

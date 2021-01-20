@@ -1,6 +1,6 @@
 using System;
 
-using Data.Shared;
+using Data.Contracts.EntityOrm;
 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;

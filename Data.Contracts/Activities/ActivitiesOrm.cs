@@ -1,8 +1,8 @@
 using System;
 
+using Data.Contracts.EntityOrm;
 using Data.Contracts.Projects;
 using Data.Contracts.Tasks;
-using Data.Shared;
 
 namespace Data.Contracts.Activities
 {

@@ -1,6 +1,6 @@
 using System;
 
-namespace Data.Shared
+namespace Data.Contracts.EntityOrm
 {
     public abstract class EntityOrmBase<TEntityOrmIdType> : IEntityOrm<TEntityOrmIdType>
         where TEntityOrmIdType : IComparable<TEntityOrmIdType>, IEquatable<TEntityOrmIdType>

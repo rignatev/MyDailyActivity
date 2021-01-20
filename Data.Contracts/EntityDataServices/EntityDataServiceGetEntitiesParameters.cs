@@ -2,19 +2,19 @@ using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 
-using Data.Shared;
+using Infrastructure.Shared.Entities;
 
 namespace Data.Contracts.EntityDataServices
 {
-    public class EntityDataServiceGetEntitiesParameters<TEntityOrm, TEntityOrmIdType>
-        where TEntityOrm : class, IEntityOrm<TEntityOrmIdType>, new()
-        where TEntityOrmIdType : IComparable<TEntityOrmIdType>, IEquatable<TEntityOrmIdType>
+    public class EntityDataServiceGetEntitiesParameters<TEntity, TEntityIdType>
+        where TEntity : class, IEntity<TEntityIdType>, new()
+        where TEntityIdType : IComparable<TEntityIdType>, IEquatable<TEntityIdType>
     {
-        public IEnumerable<TEntityOrmIdType> Ids { get; set; }
+        public IEnumerable<TEntityIdType> Ids { get; set; }
 
         public bool? OrderByDescending { get; set; }
 
-        public Expression<Func<TEntityOrm, object>> OrderByProperty { get; set; }
+        public Expression<Func<TEntity, object>> OrderByProperty { get; set; }
 
         public int? Count { get; set; }
 

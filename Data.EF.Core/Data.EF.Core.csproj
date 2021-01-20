@@ -6,7 +6,6 @@
 
     <ItemGroup>
       <ProjectReference Include="..\Data.Contracts\Data.Contracts.csproj" />
-      <ProjectReference Include="..\Data.Shared\Data.Shared.csproj" />
       <ProjectReference Include="..\Infrastructure.Shared\Infrastructure.Shared.csproj" />
     </ItemGroup>
 
