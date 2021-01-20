@@ -6,7 +6,7 @@ using Data.Contracts.Tasks;
 
 namespace Data.Contracts.Activities
 {
-    public class ActivitiesOrm : EntityOrmBase<int>
+    public class ActivityOrm : EntityOrmBase<int>
     {
         public DateTime StartDateTimeUtc { get; set; }
 
@@ -23,5 +23,7 @@ namespace Data.Contracts.Activities
         public int? TaskId { get; set; }
 
         public TaskOrm Task { get; set; }
+        
+        public bool IsHidden { get; set; }
     }
 }

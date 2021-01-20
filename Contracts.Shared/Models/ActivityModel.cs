@@ -17,5 +17,7 @@ namespace Contracts.Shared.Models
         public ProjectModel Project { get; set; }
 
         public TaskModel Task { get; set; }
+
+        public bool IsHidden { get; set; }
     }
 }

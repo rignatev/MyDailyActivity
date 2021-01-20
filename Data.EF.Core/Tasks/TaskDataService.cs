@@ -3,6 +3,7 @@ using System;
 using Contracts.Shared.Models;
 
 using Data.Contracts.Tasks;
+using Data.EF.Core.Utils;
 
 using Microsoft.EntityFrameworkCore;
 
@@ -17,46 +18,16 @@ namespace Data.EF.Core.Tasks
         }
 
         /// <inheritdoc />
-        protected override TaskModel ConvertToEntity(TaskOrm entityOrm)
-        {
-            if (entityOrm == null)
-            {
-                return null;
-            }
-
-            return new TaskModel
-            {
-                Id = ConvertToEntityId(entityOrm.Id),
-                CreatedDateTimeUtc = entityOrm.CreatedDateTimeUtc,
-                ModifiedDateTimeUtc = entityOrm.ModifiedDateTimeUtc,
-                Name = entityOrm.Name,
-                Description = entityOrm.Description,
-                IsHidden = entityOrm.IsHidden
-            };
-        }
+        protected override TaskModel ConvertToEntity(TaskOrm entityOrm) =>
+            entityOrm?.ToTaskModel(x => x);
 
         /// <inheritdoc />
         protected override int ConvertToEntityId(int entityOrmIdType) =>
             entityOrmIdType;
 
         /// <inheritdoc />
-        protected override TaskOrm ConvertToEntityOrm(TaskModel entity)
-        {
-            if (entity == null)
-            {
-                return null;
-            }
-
-            return new TaskOrm
-            {
-                Id = ConvertToEntityOrmId(entity.Id),
-                CreatedDateTimeUtc = entity.CreatedDateTimeUtc,
-                ModifiedDateTimeUtc = entity.ModifiedDateTimeUtc,
-                Name = entity.Name,
-                Description = entity.Description,
-                IsHidden = entity.IsHidden
-            };
-        }
+        protected override TaskOrm ConvertToEntityOrm(TaskModel entity) =>
+            entity?.ToTaskOrm(x => x);
 
         /// <inheritdoc />
         protected override int ConvertToEntityOrmId(int entityIdType) =>
