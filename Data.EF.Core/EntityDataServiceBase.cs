@@ -13,7 +13,6 @@ using Infrastructure.Shared.OperationResult;
 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Data.EF.Core
 {
@@ -233,14 +232,18 @@ namespace Data.EF.Core
 
         protected abstract TEntityOrmIdType ConvertToEntityOrmId(TEntityIdType entityIdType);
 
-        static private DbSet<TEntityOrm> GetEntityDbSet(OperationScopeBase<TDbContext> scope) =>
+        static protected DbSet<TEntityOrm> GetEntityDbSet(OperationScopeBase<TDbContext> scope) =>
             scope.DbContext.Set<TEntityOrm>();
 
-        private ReaderScope<TDbContext> CreateReaderScope() =>
-            _serviceProvider.GetRequiredService<ReaderScope<TDbContext>>();
+        static protected DbSet<TCustomEntityOrm> GetEntityDbSet<TCustomEntityOrm>(OperationScopeBase<TDbContext> scope)
+            where TCustomEntityOrm : class =>
+            scope.DbContext.Set<TCustomEntityOrm>();
 
-        private ModificationScope<TDbContext> CreateModificationScope() =>
-            _serviceProvider.GetRequiredService<ModificationScope<TDbContext>>();
+        protected ReaderScope<TDbContext> CreateReaderScope() =>
+            new(_serviceProvider);
+
+        protected ModificationScope<TDbContext> CreateModificationScope() =>
+            new(_serviceProvider);
 
         static private Expression<Func<TEntityOrm, object>> ConvertToEntityOrmProperty(Expression<Func<TEntity, object>> entityProperty) =>
             // TODO: Implement convertion

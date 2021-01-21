@@ -1,3 +1,5 @@
+using System;
+
 using Microsoft.EntityFrameworkCore;
 
 namespace Data.EF.Core.OperationScopes
@@ -8,7 +10,7 @@ namespace Data.EF.Core.OperationScopes
         private bool _disposed;
 
         /// <inheritdoc />
-        public ReaderScope(TDbContext dbContext) : base(dbContext)
+        public ReaderScope(IServiceProvider serviceProvider) : base(serviceProvider)
         {
             ScopeLock.EnterReadLock();
             this.DbContext.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;

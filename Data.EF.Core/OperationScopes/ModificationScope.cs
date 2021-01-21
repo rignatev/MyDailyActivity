@@ -1,3 +1,5 @@
+using System;
+
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 
@@ -10,7 +12,7 @@ namespace Data.EF.Core.OperationScopes
         private bool _disposed;
 
         /// <inheritdoc />
-        public ModificationScope(TDbContext dbContext) : base(dbContext)
+        public ModificationScope(IServiceProvider serviceProvider) : base(serviceProvider)
         {
             ScopeLock.EnterWriteLock();
             _transaction = this.DbContext.Database.BeginTransaction();

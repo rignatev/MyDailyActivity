@@ -18,7 +18,7 @@ namespace Services.Contracts.EntityServices
 
         OperationResult DeleteRange(IEnumerable<TEntityIdType> ids);
 
-        OperationResult<TEntity> GetEntity(TEntityIdType id, bool includeRelated);
+        OperationResult<TEntity> GetEntity(TEntityIdType id, bool includeRelated = false);
 
         OperationResult<IEnumerable<TEntity>> GetEntities(EntityServiceGetEntitiesParameters<TEntity, TEntityIdType> parameters);
     }

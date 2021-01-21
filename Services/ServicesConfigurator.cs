@@ -2,7 +2,11 @@ using Data.EF.Core;
 
 using Microsoft.Extensions.DependencyInjection;
 
+using Services.Activities;
+using Services.Contracts.Activities;
+using Services.Contracts.Projects;
 using Services.Contracts.Tasks;
+using Services.Projects;
 using Services.Tasks;
 
 namespace Services
@@ -13,7 +17,9 @@ namespace Services
         {
             DataServicesConfigurator.ConfigureServices(serviceCollection, connectionString);
 
-            serviceCollection.AddScoped<ITaskService,TaskService>();
+            serviceCollection.AddScoped<ITaskService, TaskService>();
+            serviceCollection.AddScoped<IProjectService, ProjectService>();
+            serviceCollection.AddScoped<IActivityService, ActivityService>();
         }
     }
 }

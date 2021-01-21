@@ -39,8 +39,9 @@ namespace Data.Migrations.Migrations
                 .WithColumn("Duration").AsTime().NotNullable()
                 .WithColumn("Description").AsString().Nullable()
                 .WithColumn("ProjectId").AsInt32().Nullable().ForeignKey(projectsTableName, "Id")
-                .WithColumn("TaskId").AsInt32().Nullable().ForeignKey(tasksTableName, "Id");
-            
+                .WithColumn("TaskId").AsInt32().Nullable().ForeignKey(tasksTableName, "Id")
+                .WithColumn("IsHidden").AsBoolean().NotNullable();
+
             // @formatter:on
         }
     }
