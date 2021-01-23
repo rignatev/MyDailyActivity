@@ -70,11 +70,18 @@ namespace Data.EF.Core
         }
 
         /// <inheritdoc />
-        public OperationResult<IEnumerable<TEntity>> GetEntities(EntityDataServiceGetEntitiesParameters<TEntity, TEntityIdType> parameters)
+        public OperationResult<List<TEntity>> GetEntities(EntityDataServiceGetEntitiesParameters<TEntity, TEntityIdType> parameters)
         {
             using ReaderScope<TDbContext> readerScope = CreateReaderScope();
 
-            return GetEntities(parameters, readerScope);
+            OperationResult<IEnumerable<TEntity>> result = GetEntities(parameters, readerScope);
+
+            if (result.Success)
+            {
+                return OperationResult<List<TEntity>>.Ok(result.Value.ToList());
+            }
+
+            return OperationResult<List<TEntity>>.Fail(result.Error);
         }
 
         protected OperationResult<TEntityIdType> Create(TEntity entity, ModificationScope<TDbContext> modificationScope)
@@ -218,14 +225,14 @@ namespace Data.EF.Core
                     query = query.Where(x => parameters.Ids.Select(ConvertToEntityOrmId).Contains(x.Id));
                 }
 
-                if (parameters.OrderByDescending != null)
+                if (parameters.OrderByProperty != null)
                 {
-                    if (parameters.OrderByProperty == null)
+                    if (parameters.OrderByDescending == null)
                     {
-                        throw new ArgumentNullException($"Argument {nameof(parameters.OrderByProperty)} is null.");
+                        throw new ArgumentNullException($"Argument {nameof(parameters.OrderByDescending)} is null.");
                     }
 
-                    query = parameters.OrderByDescending == true
+                    query = (bool)parameters.OrderByDescending
                         ? query.OrderByDescending(ConvertToEntityOrmProperty(parameters.OrderByProperty))
                         : query.OrderBy(ConvertToEntityOrmProperty(parameters.OrderByProperty));
                 }
@@ -274,8 +281,31 @@ namespace Data.EF.Core
         protected ModificationScope<TDbContext> CreateModificationScope() =>
             new(_serviceProvider);
 
-        static private Expression<Func<TEntityOrm, object>> ConvertToEntityOrmProperty(Expression<Func<TEntity, object>> entityProperty) =>
-            // TODO: Implement convertion
-            throw new NotImplementedException();
+        static private Expression<Func<TEntityOrm, T>> ConvertToEntityOrmProperty<T>(Expression<Func<TEntity, T>> entityProperty)
+        {
+            ParameterExpression parameter = Expression.Parameter(typeof(TEntityOrm), "x");
+            Expression<Func<TEntityOrm, T>> lambdaExpression;
+
+            if (entityProperty.Body is UnaryExpression unaryExpression)
+            {
+                var memberExpression = (MemberExpression)unaryExpression.Operand;
+                string entityPropertyName = memberExpression.Member.Name;
+                MemberExpression property = Expression.Property(parameter, entityPropertyName);
+                UnaryExpression lambdaBody = Expression.Convert(property, typeof(object));
+                lambdaExpression = Expression.Lambda<Func<TEntityOrm, T>>(lambdaBody, parameter);
+            }
+            else if(entityProperty.Body is MemberExpression memberExpression)
+            {
+                string entityPropertyName = memberExpression.Member.Name;
+                MemberExpression lambdaBody = Expression.Property(parameter, entityPropertyName);
+                lambdaExpression = Expression.Lambda<Func<TEntityOrm, T>>(lambdaBody, parameter);
+            }
+            else
+            {
+                throw new Exception("Not handled expression body type.");
+            }
+
+            return lambdaExpression;
+        }
     }
 }

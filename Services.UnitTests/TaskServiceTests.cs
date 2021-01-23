@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 using Contracts.Shared.Models;
 
@@ -12,6 +14,7 @@ using Infrastructure.Shared.OperationResult;
 using Microsoft.Extensions.DependencyInjection;
 
 using Services.Contracts.Activities;
+using Services.Contracts.EntityServices;
 
 using Xunit;
 
@@ -33,9 +36,12 @@ namespace Services.UnitTests
 
             ServiceProvider serviceProvider = serviceCollection.BuildServiceProvider();
 
-            // using (IServiceScope serviceScope = serviceProvider.CreateScope())
-            // {
-                DateTime nowUtc = DateTime.UtcNow;
+            using (IServiceScope serviceScope = serviceProvider.CreateScope())
+            {
+                var random = new Random();
+                int rndValue = random.Next(minValue: 1, maxValue: 100);
+                DateTime nowUtc = DateTime.UtcNow.AddHours(rndValue);
+
                 var task = new TaskModel
                 {
                     Name = "Test task",
@@ -43,13 +49,6 @@ namespace Services.UnitTests
                     IsHidden = false,
                     CreatedDateTimeUtc = nowUtc
                 };
-
-                // var taskService = serviceScope.ServiceProvider.GetRequiredService<ITaskService>();
-                // OperationResult<int> taskCreateResult = taskService.Create(task);
-                //
-                // taskCreateResult.Success.Should().BeTrue();
-
-                // var projectService = serviceScope.ServiceProvider.GetRequiredService<IProjectService>();
 
                 var project = new ProjectModel
                 {
@@ -63,7 +62,7 @@ namespace Services.UnitTests
 
                 var activity = new ActivityModel
                 {
-                    Description = "Test activity",
+                    Description = $"Test activity {rndValue}",
                     CreatedDateTimeUtc = nowUtc,
                     Task = task,
                     Project = project,
@@ -73,7 +72,8 @@ namespace Services.UnitTests
                     IsHidden = false
                 };
 
-                var activityService = serviceProvider.GetRequiredService<IActivityService>();
+                var activityService = serviceScope.ServiceProvider.GetRequiredService<IActivityService>();
+                
                 OperationResult<int> activityCreateResult = activityService.Create(activity);
 
                 activityCreateResult.Success.Should().BeTrue();
@@ -98,10 +98,20 @@ namespace Services.UnitTests
                     activityFromDb.Id,
                     includeRelated: true
                 );
-
+                
                 activityGetResult.Success.Should().BeTrue();
 
-            // }
+                var parameters = new EntityServiceGetEntitiesParameters<ActivityModel, int>
+                {
+                    IncludeRelated = true,
+                    OrderByProperty = x => x.Task,
+                    OrderByDescending = false
+                };
+
+                OperationResult<List<ActivityModel>> activityGetEntitiesResult = activityService.GetEntities(parameters);
+
+                activityGetEntitiesResult.Success.Should().BeTrue();
+            }
         }
     }
 }

@@ -54,7 +54,7 @@ namespace Services
         }
 
         /// <inheritdoc />
-        public OperationResult<IEnumerable<TEntity>> GetEntities(EntityServiceGetEntitiesParameters<TEntity, TEntityIdType> parameters)
+        public OperationResult<List<TEntity>> GetEntities(EntityServiceGetEntitiesParameters<TEntity, TEntityIdType> parameters)
         {
             var dataServiceGetEntitiesParameters = new EntityDataServiceGetEntitiesParameters<TEntity, TEntityIdType>
             {
@@ -65,11 +65,11 @@ namespace Services
                 IncludeRelated = parameters.IncludeRelated
             };
 
-            OperationResult<IEnumerable<TEntity>> dataServiceResult = this.EntityDataService.GetEntities(dataServiceGetEntitiesParameters);
+            OperationResult<List<TEntity>> dataServiceResult = this.EntityDataService.GetEntities(dataServiceGetEntitiesParameters);
 
             return dataServiceResult.Success
-                ? OperationResult<IEnumerable<TEntity>>.Ok(dataServiceResult.Value)
-                : OperationResult<IEnumerable<TEntity>>.Fail(dataServiceResult.Error);
+                ? OperationResult<List<TEntity>>.Ok(dataServiceResult.Value)
+                : OperationResult<List<TEntity>>.Fail(dataServiceResult.Error);
         }
     }
 }

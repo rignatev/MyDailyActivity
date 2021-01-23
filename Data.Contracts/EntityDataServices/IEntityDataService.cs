@@ -20,6 +20,6 @@ namespace Data.Contracts.EntityDataServices
 
         OperationResult<TEntity> GetEntity(TEntityIdType id, bool includeRelated);
 
-        OperationResult<IEnumerable<TEntity>> GetEntities(EntityDataServiceGetEntitiesParameters<TEntity, TEntityIdType> parameters);
+        OperationResult<List<TEntity>> GetEntities(EntityDataServiceGetEntitiesParameters<TEntity, TEntityIdType> parameters);
     }
 }
