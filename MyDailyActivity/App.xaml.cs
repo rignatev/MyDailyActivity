@@ -7,8 +7,7 @@ using Avalonia.Markup.Xaml;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-using MyDailyActivity.ViewModels;
-using MyDailyActivity.Views;
+using MyDailyActivity.MainWindow;
 
 using Services;
 
@@ -31,10 +30,12 @@ namespace MyDailyActivity
                     .Build();
 
                 var serviceCollection = new ServiceCollection();
-
                 ServicesConfigurator.ConfigureServices(serviceCollection, configuration.GetConnectionString("Sqlite"));
+                ServiceProvider serviceProvider = serviceCollection.BuildServiceProvider();
 
-                desktop.MainWindow = new MainWindow { DataContext = new MainWindowViewModel() };
+                ServicesConfigurator.InitializeDb();
+                
+                desktop.MainWindow = new MainWindowView { DataContext = new MainWindowViewModel(serviceProvider) };
             }
 
             base.OnFrameworkInitializationCompleted();

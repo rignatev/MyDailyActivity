@@ -21,5 +21,10 @@ namespace Services
             serviceCollection.AddScoped<IProjectService, ProjectService>();
             serviceCollection.AddScoped<IActivityService, ActivityService>();
         }
+
+        static public void InitializeDb()
+        {
+            DataServicesConfigurator.InitializeDb();
+        }
     }
 }

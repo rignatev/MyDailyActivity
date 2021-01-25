@@ -6,6 +6,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\Data.Contracts\Data.Contracts.csproj" />
+      <ProjectReference Include="..\Data.Migrations\Data.Migrations.csproj" />
       <ProjectReference Include="..\Infrastructure.Shared\Infrastructure.Shared.csproj" />
     </ItemGroup>
 

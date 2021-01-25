@@ -103,7 +103,7 @@ namespace Data.EF.Core.Utils
                     break;
                 }
 
-                entityType = stack.Peek().Current.GetTargetType();
+                entityType = stack.Peek().Current.TargetEntityType;
             }
         }
     }

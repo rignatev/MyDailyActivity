@@ -1,12 +1,12 @@
-using Avalonia;
-using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 
-namespace MyDailyActivity.Views
+using Client.Shared.Views;
+
+namespace Client.Shared.Controls.ButtonsBars
 {
-    public class MainWindow : Window
+    public class EditButtonsBarView : UserControlViewBase
     {
-        public MainWindow()
+        public EditButtonsBarView()
         {
             InitializeComponent();
         }

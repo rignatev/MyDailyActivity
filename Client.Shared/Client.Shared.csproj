@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net5.0</TargetFramework>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <Compile Update="**\*.xaml.cs">
+            <DependentUpon>%(Filename)</DependentUpon>
+        </Compile>
+        <AvaloniaResource Include="**\*.xaml">
+            <SubType>Designer</SubType>
+        </AvaloniaResource>
+        <AvaloniaResource Include="Assets\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Avalonia" Version="0.10.0" />
+      <PackageReference Include="Avalonia.Desktop" Version="0.10.0" />
+      <PackageReference Include="Avalonia.ReactiveUI" Version="0.10.0" />
+      <PackageReference Include="Avalonia.ReactiveUI.Events" Version="0.10.0" />
+      <PackageReference Include="MessageBox.Avalonia" Version="1.0.1" />
+      <PackageReference Include="ReactiveUI.Fody" Version="13.1.1" />
+    </ItemGroup>
+
+</Project>

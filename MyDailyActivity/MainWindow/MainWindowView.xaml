@@ -1,0 +1,31 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:mainWindow="clr-namespace:MyDailyActivity.MainWindow"
+        mc:Ignorable="d" d:DesignWidth="400" d:DesignHeight="150"
+        x:Class="MyDailyActivity.MainWindow.MainWindowView"
+        MinWidth="400" MinHeight="150" Width="400" Height="150"
+        Icon="/Assets/avalonia-logo.ico"
+        Title="MyDailyActivity">
+
+    <Design.DataContext>
+        <mainWindow:MainWindowViewModel />
+    </Design.DataContext>
+
+    <Grid ColumnDefinitions="*" RowDefinitions="Auto,*">
+        <Menu Grid.Column="0" Grid.Row="0" Items="{Binding MenuItems}">
+            <Menu.Styles>
+                <Style Selector="MenuItem">
+                    <Setter Property="Header" Value="{Binding Header}" />
+                    <Setter Property="Items" Value="{Binding Items}" />
+                    <Setter Property="Command" Value="{Binding Command}" />
+                    <Setter Property="CommandParameter" Value="{Binding CommandParameter}" />
+                </Style>
+            </Menu.Styles>
+        </Menu>
+
+        <TextBlock Grid.Column="0" Grid.Row="1" Text="{Binding Greeting}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+    </Grid>
+
+</Window>
