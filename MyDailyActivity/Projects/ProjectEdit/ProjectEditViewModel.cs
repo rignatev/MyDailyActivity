@@ -9,9 +9,9 @@ using Contracts.Shared.Models;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
-namespace MyDailyActivity.Tasks.TaskEdit
+namespace MyDailyActivity.Projects.ProjectEdit
 {
-    public class TaskEditViewModel : ReactiveWindowViewModelBase
+    public class ProjectEditViewModel : ReactiveWindowViewModelBase
     {
         private int Id { get; }
 
@@ -28,19 +28,19 @@ namespace MyDailyActivity.Tasks.TaskEdit
 
         private BottomButtonsBarViewModel BottomButtonsBarViewModel { get; set; }
 
-        public TaskModel Model { get; }
+        public ProjectModel Model { get; }
 
         public bool IsSuccess { get; private set; }
 
         /// <inheritdoc />
-        public TaskEditViewModel(TaskModel task)
+        public ProjectEditViewModel(ProjectModel project)
         {
-            this.Model = task;
+            this.Model = project;
 
-            this.Id = task.Id;
-            this.Name = task.Name;
-            this.Description = task.Description;
-            this.IsHidden = task.IsHidden;
+            this.Id = project.Id;
+            this.Name = project.Name;
+            this.Description = project.Description;
+            this.IsHidden = project.IsHidden;
 
             this.ItemChanged = this.WhenAnyValue(
                     x => x.Name,

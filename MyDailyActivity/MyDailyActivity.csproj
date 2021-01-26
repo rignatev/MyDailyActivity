@@ -18,6 +18,9 @@
     <Compile Update="Tasks\TasksWindowViewView.xaml.cs">
       <DependentUpon>TasksWindowView.xaml</DependentUpon>
     </Compile>
+    <Compile Update="Projects\ProjectsWindowViewView.xaml.cs">
+      <DependentUpon>ProjectsWindowView.xaml</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Avalonia" Version="0.10.0" />

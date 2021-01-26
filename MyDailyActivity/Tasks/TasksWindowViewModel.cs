@@ -15,6 +15,7 @@ using DynamicData;
 using DynamicData.Binding;
 
 using Infrastructure.Shared.OperationResult;
+using Infrastructure.Shared.Utils;
 
 using MessageBox.Avalonia.Enums;
 
@@ -32,7 +33,7 @@ namespace MyDailyActivity.Tasks
 {
     public class TasksWindowViewModel : ReactiveWindowViewModelBase
     {
-        public class ViewListItem
+        internal class ViewListItem
         {
             public int Id { get; }
 
@@ -61,20 +62,20 @@ namespace MyDailyActivity.Tasks
         private readonly SourceCache<TaskModel, int> _tasksSource = new(x => x.Id);
         private ReadOnlyObservableCollection<ViewListItem> _viewListItems;
 
-        public IEnumerable<ViewListItem> ViewListItems => _viewListItems;
-
-        public bool TasksChanged { get; set; }
+        private IEnumerable<ViewListItem> ViewListItems => _viewListItems;
 
         [Reactive]
-        public ViewListItem SelectedTask { get; set; }
+        private ViewListItem SelectedTask { get; set; }
+
+        private EditButtonsBarViewModel EditButtonsBarViewModel { get; set; }
+
+        private BottomButtonsBarViewModel BottomButtonsBarViewModel { get; set; }
+
+        public IObservable<IChangeSet<TaskModel, int>> TasksChanged { get; }
 
         [Reactive]
-        public List<ViewListItem> SelectedTasks { get; set; } =
+        internal List<ViewListItem> SelectedTasks { get; set; } =
             new();
-
-        public EditButtonsBarViewModel EditButtonsBarViewModel { get; private set; }
-
-        public BottomButtonsBarViewModel BottomButtonsBarViewModel { get; private set; }
 
         public TasksWindowViewModel(IServiceProvider serviceProvider)
         {
@@ -83,12 +84,14 @@ namespace MyDailyActivity.Tasks
             InitializeTasksSource();
             InitializeEditButtonsBar();
             InitializeBottomButtonsBar();
+            
+            this.TasksChanged = _tasksSource.Connect().ObserveOn(RxApp.MainThreadScheduler);
         }
 
         /// <inheritdoc />
         protected override void HandleActivation(CompositeDisposable disposables)
         {
-            this.WhenAnyValue(x => x.SelectedTasks).Subscribe(_ => SelectedTasksChanged());
+            this.WhenAnyValue(x => x.SelectedTasks).Subscribe(_ => SelectedTasksChanged()).DisposeWith(disposables);
 
             this.SelectedTask = this.ViewListItems.FirstOrDefault();
         }
@@ -124,10 +127,10 @@ namespace MyDailyActivity.Tasks
         {
             this.EditButtonsBarViewModel = new EditButtonsBarViewModel();
 
-            this.EditButtonsBarViewModel.CreateCommand.Subscribe(async unit => await CreateActionAsync());
-            this.EditButtonsBarViewModel.CopyCommand.Subscribe(async unit => await CopyActionAsync());
-            this.EditButtonsBarViewModel.EditCommand.Subscribe(async unit => await EditActionAsync());
-            this.EditButtonsBarViewModel.DeleteCommand.Subscribe(async unit => await DeleteActionAsync());
+            this.EditButtonsBarViewModel.CreateCommand.Subscribe(async _ => await CreateActionAsync());
+            this.EditButtonsBarViewModel.CopyCommand.Subscribe(async _ => await CopyActionAsync());
+            this.EditButtonsBarViewModel.EditCommand.Subscribe(async _ => await EditActionAsync());
+            this.EditButtonsBarViewModel.DeleteCommand.Subscribe(async _ => await DeleteActionAsync());
 
             UpdateEditButtonsState();
         }
@@ -177,7 +180,6 @@ namespace MyDailyActivity.Tasks
 
             _tasksSource.AddOrUpdate(newTask);
 
-            this.TasksChanged = true;
             this.SelectedTask = this.ViewListItems.First(x => x.Id == newTask.Id);
         }
 
@@ -199,11 +201,11 @@ namespace MyDailyActivity.Tasks
             {
                 return;
             }
+
             modifiedTask.Id = createResult.Value;
 
             _tasksSource.AddOrUpdate(modifiedTask);
 
-            this.TasksChanged = true;
             this.SelectedTask = this.ViewListItems.First(x => x.Id == modifiedTask.Id);
         }
 
@@ -228,7 +230,6 @@ namespace MyDailyActivity.Tasks
 
             _tasksSource.AddOrUpdate(modifiedTask);
 
-            this.TasksChanged = true;
             this.SelectedTask = this.ViewListItems.First(x => x.Id == modifiedTask.Id);
         }
 
@@ -246,23 +247,28 @@ namespace MyDailyActivity.Tasks
                 return;
             }
 
+            var deletedIds = new List<int>(this.SelectedTasks.Count);
+
             foreach (ViewListItem selectedTask in this.SelectedTasks)
             {
                 OperationResult deleteResult = _taskService.Delete(selectedTask.Id);
 
                 if (deleteResult.Success)
                 {
-                    _tasksSource.RemoveKey(selectedTask.Id);
-
-                    this.TasksChanged = true;
+                    deletedIds.Add(selectedTask.Id);
                 }
                 else
                 {
                     await ShowErrorDialog(
-                        $"Fail to delete task: {selectedTask.Name}.\n{deleteResult.Error.Message}",
+                        $"Fail to delete: {selectedTask.Name}.\n{deleteResult.Error.Message}",
                         "Delete action"
                     );
                 }
+            }
+
+            if (!deletedIds.IsNullOrEmpty())
+            {
+                _tasksSource.RemoveKeys(deletedIds);
             }
         }
 
