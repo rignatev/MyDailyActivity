@@ -41,6 +41,7 @@ namespace MyDailyActivity.MainWindow
         {
             var projectsWindow = new ProjectsWindowView { DataContext = new ProjectsWindowViewModel(_serviceProvider) };
 
+            projectsWindow.ViewModel.ProjectsChanged.Subscribe(projectChangeSet => Console.WriteLine(projectChangeSet.Count));
             // projectsWindow.Closing += ProjectsWindowOnClosing;
 
             projectsWindow.Show();

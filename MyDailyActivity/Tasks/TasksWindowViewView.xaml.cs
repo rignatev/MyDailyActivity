@@ -1,9 +1,13 @@
 using System.Linq;
+using System.Reactive.Linq;
 
 using Avalonia.Controls;
+using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 
 using Client.Shared.Views;
+
+using ReactiveUI;
 
 namespace MyDailyActivity.Tasks
 {
@@ -21,10 +25,15 @@ namespace MyDailyActivity.Tasks
 
         private void TasksDataGrid_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (e.Source is DataGrid dataGrid)
+            if (sender is DataGrid dataGrid)
             {
                 this.ViewModel.SelectedTasks = dataGrid.SelectedItems.Cast<TasksWindowViewModel.ViewListItem>().ToList();
             }
+        }
+
+        private void InputElement_OnDoubleTapped(object sender, RoutedEventArgs e)
+        {
+            Observable.Start(() => { }).ObserveOn(RxApp.MainThreadScheduler).InvokeCommand(this.ViewModel.DataGridOnDoubleTapped);
         }
     }
 }

@@ -16,6 +16,7 @@
             Grid.Column="0" Grid.Row="1"
             Items="{Binding ViewListItems}"
             SelectionChanged="TasksDataGrid_OnSelectionChanged"
+            DoubleTapped="InputElement_OnDoubleTapped"
             SelectedItem="{Binding SelectedTask, Mode=TwoWay}"
             Margin="10,10,10,0"
             CanUserResizeColumns="True"

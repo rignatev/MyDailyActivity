@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
@@ -73,6 +74,8 @@ namespace MyDailyActivity.Projects
 
         public IObservable<IChangeSet<ProjectModel, int>> ProjectsChanged { get; }
 
+        internal ReactiveCommand<Unit, Unit> DataGridOnDoubleTapped { get; set; }
+
         [Reactive]
         internal List<ViewListItem> SelectedProjects { get; set; } =
             new();
@@ -86,6 +89,8 @@ namespace MyDailyActivity.Projects
             InitializeBottomButtonsBar();
 
             this.ProjectsChanged = _projectsSource.Connect().ObserveOn(RxApp.MainThreadScheduler);
+
+            this.DataGridOnDoubleTapped = ReactiveCommand.Create<Unit>(async _ => await EditActionAsync());
         }
 
         /// <inheritdoc />

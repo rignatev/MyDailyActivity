@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
@@ -62,7 +63,7 @@ namespace MyDailyActivity.Tasks
         private readonly SourceCache<TaskModel, int> _tasksSource = new(x => x.Id);
         private ReadOnlyObservableCollection<ViewListItem> _viewListItems;
 
-        private IEnumerable<ViewListItem> ViewListItems => _viewListItems;
+        private ICollection<ViewListItem> ViewListItems => _viewListItems;
 
         [Reactive]
         private ViewListItem SelectedTask { get; set; }
@@ -72,6 +73,8 @@ namespace MyDailyActivity.Tasks
         private BottomButtonsBarViewModel BottomButtonsBarViewModel { get; set; }
 
         public IObservable<IChangeSet<TaskModel, int>> TasksChanged { get; }
+
+        internal ReactiveCommand<Unit, Unit> DataGridOnDoubleTapped { get; set; }
 
         [Reactive]
         internal List<ViewListItem> SelectedTasks { get; set; } =
@@ -84,8 +87,10 @@ namespace MyDailyActivity.Tasks
             InitializeTasksSource();
             InitializeEditButtonsBar();
             InitializeBottomButtonsBar();
-            
+
             this.TasksChanged = _tasksSource.Connect().ObserveOn(RxApp.MainThreadScheduler);
+
+            this.DataGridOnDoubleTapped = ReactiveCommand.Create<Unit>(async _ => await EditActionAsync());
         }
 
         /// <inheritdoc />
