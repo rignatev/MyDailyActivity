@@ -63,7 +63,7 @@ namespace MyDailyActivity.Tasks
         private readonly SourceCache<TaskModel, int> _tasksSource = new(x => x.Id);
         private ReadOnlyObservableCollection<ViewListItem> _viewListItems;
 
-        private ICollection<ViewListItem> ViewListItems => _viewListItems;
+        private IEnumerable<ViewListItem> ViewListItems => _viewListItems;
 
         [Reactive]
         private ViewListItem SelectedTask { get; set; }
