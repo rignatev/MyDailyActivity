@@ -1,0 +1,33 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:buttonsBars="clr-namespace:Client.Shared.Controls.ButtonsBars;assembly=Client.Shared"
+        x:Class="MyDailyActivity.Activities.ActivityEdit.ActivityEditView"
+        Title="Activity edit"
+        Icon="/Assets/avalonia-logo.ico"
+        Width="400"
+        SizeToContent="Height"
+        CanResize="False"
+        WindowStartupLocation="CenterOwner">
+
+    <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,*,Auto,Auto" Margin="10">
+        <TextBlock Text="Description:" Grid.Column="0" Grid.Row="1" Margin="0 0 0 10" />
+        <TextBox
+            Grid.Column="1" Grid.Row="1"
+            Text="{Binding Description}"
+            Margin="5 0 0 10"
+            TextWrapping="Wrap"
+            AcceptsReturn="True"
+            MinHeight="42" />
+
+        <TextBlock Text="Hidden:" Grid.Column="0" Grid.Row="2" VerticalAlignment="Center" Margin="0 0 0 10" />
+        <CheckBox
+            Grid.Column="1" Grid.Row="2"
+            IsChecked="{Binding IsHidden}"
+            Margin="5 0 0 10" />
+
+        <buttonsBars:BottomButtonsBarView
+            Grid.Column="1" Grid.Row="3"
+            DataContext="{Binding BottomButtonsBarViewModel}"
+            HorizontalAlignment="Right" />
+    </Grid>
+</Window>

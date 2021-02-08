@@ -26,7 +26,7 @@ namespace Contracts.Shared.Models
         {
             createdDateTimeUtc ??= DateTime.UtcNow;
 
-            return new ActivityModel()
+            return new ActivityModel
             {
                 Id = default,
                 CreatedDateTimeUtc = (DateTime)createdDateTimeUtc,
@@ -36,8 +36,8 @@ namespace Contracts.Shared.Models
                 StartDateTimeUtc = this.StartDateTimeUtc,
                 EndDateTimeUtc = this.EndDateTimeUtc,
                 Duration = this.Duration,
-                Project = this.Project.CopyModelForCreate((DateTime)createdDateTimeUtc),
-                Task = this.Task.CopyModelForCreate((DateTime)createdDateTimeUtc)
+                Project = this.Project?.CopyModelForCreate((DateTime)createdDateTimeUtc),
+                Task = this.Task?.CopyModelForCreate((DateTime)createdDateTimeUtc)
             };
         }
 
@@ -46,7 +46,7 @@ namespace Contracts.Shared.Models
         {
             modifiedDateTimeUtc ??= DateTime.UtcNow;
 
-            return new ActivityModel()
+            return new ActivityModel
             {
                 Id = this.Id,
                 CreatedDateTimeUtc = this.CreatedDateTimeUtc,
@@ -56,8 +56,8 @@ namespace Contracts.Shared.Models
                 StartDateTimeUtc = this.StartDateTimeUtc,
                 EndDateTimeUtc = this.EndDateTimeUtc,
                 Duration = this.Duration,
-                Project = this.Project.CopyModelForEdit((DateTime)modifiedDateTimeUtc),
-                Task = this.Task.CopyModelForEdit((DateTime)modifiedDateTimeUtc)
+                Project = this.Project?.CopyModelForEdit((DateTime)modifiedDateTimeUtc),
+                Task = this.Task?.CopyModelForEdit((DateTime)modifiedDateTimeUtc)
             };
         }
     }

@@ -4,10 +4,7 @@ using System.Reactive;
 
 using Client.Shared.ViewModels;
 
-using Contracts.Shared.Models;
-
-using DynamicData;
-
+using MyDailyActivity.Activities;
 using MyDailyActivity.Projects;
 using MyDailyActivity.Tasks;
 
@@ -21,6 +18,8 @@ namespace MyDailyActivity.MainWindow
 
         private IReadOnlyList<MenuItemViewModel> MenuItems { get; }
 
+        private ReactiveCommand<Unit, Unit> OpenActivitiesWindowViewCommand { get; }
+
         private ReactiveCommand<Unit, Unit> OpenProjectsWindowViewCommand { get; }
 
         private ReactiveCommand<Unit, Unit> OpenTasksWindowViewCommand { get; }
@@ -31,10 +30,21 @@ namespace MyDailyActivity.MainWindow
         {
             _serviceProvider = serviceProvider;
 
+            this.OpenActivitiesWindowViewCommand = ReactiveCommand.Create(OpenActivitiesWindowView);
             this.OpenProjectsWindowViewCommand = ReactiveCommand.Create(OpenProjectsWindowView);
             this.OpenTasksWindowViewCommand = ReactiveCommand.Create(OpenTasksWindowView);
 
             this.MenuItems = CreateMenu();
+        }
+
+        private void OpenActivitiesWindowView()
+        {
+            var activitiesWindow = new ActivitiesWindowView { DataContext = new ActivitiesWindowViewModel(_serviceProvider) };
+
+            activitiesWindow.ViewModel.ActivitiesChanged.Subscribe(activityChangeSet => Console.WriteLine(activityChangeSet.Count));
+            // activitiesWindow.Closing += ActivitiesWindowOnClosing;
+
+            activitiesWindow.Show();
         }
 
         private void OpenProjectsWindowView()
@@ -66,6 +76,11 @@ namespace MyDailyActivity.MainWindow
                     Header = "_Windows",
                     Items = new[]
                     {
+                        new MenuItemViewModel
+                        {
+                            Header = "_Activities",
+                            Command = this.OpenActivitiesWindowViewCommand
+                        },
                         new MenuItemViewModel
                         {
                             Header = "_Projects",
