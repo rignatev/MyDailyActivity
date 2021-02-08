@@ -15,8 +15,8 @@
         <DataGrid
             Grid.Column="0" Grid.Row="1"
             Items="{Binding ViewListItems}"
-            SelectionChanged="ProjectsDataGrid_OnSelectionChanged"
-            DoubleTapped="InputElement_OnDoubleTapped"
+            SelectionChanged="DataGrid_OnSelectionChanged"
+            DoubleTapped="DataGrid_OnDoubleTapped"
             SelectedItem="{Binding SelectedProject, Mode=TwoWay}"
             Margin="10,10,10,0"
             CanUserResizeColumns="True"

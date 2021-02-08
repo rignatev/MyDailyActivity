@@ -13,8 +13,6 @@ namespace MyDailyActivity.Tasks.TaskEdit
 {
     public class TaskEditViewModel : ReactiveWindowViewModelBase
     {
-        private int Id { get; }
-
         [Reactive]
         private bool IsHidden { get; set; }
 
@@ -37,10 +35,7 @@ namespace MyDailyActivity.Tasks.TaskEdit
         {
             this.Model = task;
 
-            this.Id = task.Id;
-            this.Name = task.Name;
-            this.Description = task.Description;
-            this.IsHidden = task.IsHidden;
+            CopyFromModel();
 
             this.ItemChanged = this.WhenAnyValue(
                     x => x.Name,
@@ -88,6 +83,13 @@ namespace MyDailyActivity.Tasks.TaskEdit
             this.Model.Name = this.Name;
             this.Model.Description = this.Description;
             this.Model.IsHidden = this.IsHidden;
+        }
+
+        private void CopyFromModel()
+        {
+            this.Name = this.Model.Name;
+            this.Description = this.Model.Description;
+            this.IsHidden = this.Model.IsHidden;
         }
 
         private void CancelAction()

@@ -1,13 +1,11 @@
+using System;
 using System.Linq;
-using System.Reactive.Linq;
 
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 
 using Client.Shared.Views;
-
-using ReactiveUI;
 
 namespace MyDailyActivity.Projects
 {
@@ -23,7 +21,7 @@ namespace MyDailyActivity.Projects
             AvaloniaXamlLoader.Load(this);
         }
 
-        private void ProjectsDataGrid_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void DataGrid_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (e.Source is DataGrid dataGrid)
             {
@@ -31,9 +29,9 @@ namespace MyDailyActivity.Projects
             }
         }
 
-        private void InputElement_OnDoubleTapped(object sender, RoutedEventArgs e)
+        private void DataGrid_OnDoubleTapped(object sender, RoutedEventArgs e)
         {
-            Observable.Start(() => { }).ObserveOn(RxApp.MainThreadScheduler).InvokeCommand(this.ViewModel.DataGridOnDoubleTapped);
+            this.ViewModel.DataGridOnDoubleTapped.Execute().Subscribe();
         }
     }
 }

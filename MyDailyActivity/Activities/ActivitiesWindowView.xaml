@@ -3,7 +3,7 @@
         xmlns:buttonsBars="clr-namespace:Client.Shared.Controls.ButtonsBars;assembly=Client.Shared"
         x:Class="MyDailyActivity.Activities.ActivitiesWindowView"
         Icon="/Assets/avalonia-logo.ico"
-        Title="Tasks"
+        Title="Activities"
         MinWidth="300" MinHeight="200" Width="600" Height="400">
 
     <Grid ColumnDefinitions="*" RowDefinitions="Auto,*,Auto">

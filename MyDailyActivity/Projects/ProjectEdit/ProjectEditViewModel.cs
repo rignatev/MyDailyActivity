@@ -13,8 +13,6 @@ namespace MyDailyActivity.Projects.ProjectEdit
 {
     public class ProjectEditViewModel : ReactiveWindowViewModelBase
     {
-        private int Id { get; }
-
         [Reactive]
         private bool IsHidden { get; set; }
 
@@ -37,10 +35,7 @@ namespace MyDailyActivity.Projects.ProjectEdit
         {
             this.Model = project;
 
-            this.Id = project.Id;
-            this.Name = project.Name;
-            this.Description = project.Description;
-            this.IsHidden = project.IsHidden;
+            CopyFromModel();
 
             this.ItemChanged = this.WhenAnyValue(
                     x => x.Name,
@@ -88,6 +83,13 @@ namespace MyDailyActivity.Projects.ProjectEdit
             this.Model.Name = this.Name;
             this.Model.Description = this.Description;
             this.Model.IsHidden = this.IsHidden;
+        }
+
+        private void CopyFromModel()
+        {
+            this.Name = this.Model.Name;
+            this.Description = this.Model.Description;
+            this.IsHidden = this.Model.IsHidden;
         }
 
         private void CancelAction()
