@@ -59,6 +59,7 @@ namespace MyDailyActivity.Projects
             }
         }
 
+        private readonly IServiceScope _serviceScope;
         private readonly IProjectService _projectService;
         private readonly SourceCache<ProjectModel, int> _projectsSource = new(x => x.Id);
         private ReadOnlyObservableCollection<ViewListItem> _viewListItems;
@@ -74,7 +75,7 @@ namespace MyDailyActivity.Projects
 
         public IObservable<IChangeSet<ProjectModel, int>> ProjectsChanged { get; }
 
-        internal ReactiveCommand<Unit, Unit> DataGridOnDoubleTapped { get; set; }
+        internal ReactiveCommand<Unit, Unit> DataGridOnDoubleTapped { get; private set; }
 
         [Reactive]
         internal List<ViewListItem> SelectedProjects { get; set; } =
@@ -82,23 +83,29 @@ namespace MyDailyActivity.Projects
 
         public ProjectsWindowViewModel(IServiceProvider serviceProvider)
         {
-            _projectService = serviceProvider.GetRequiredService<IProjectService>();
+            _serviceScope = serviceProvider.CreateScope();
+            _projectService = _serviceScope.ServiceProvider.GetRequiredService<IProjectService>();
 
             InitializeProjectsSource();
             InitializeEditButtonsBar();
             InitializeBottomButtonsBar();
 
             this.ProjectsChanged = _projectsSource.Connect().ObserveOn(RxApp.MainThreadScheduler);
-
-            this.DataGridOnDoubleTapped = ReactiveCommand.Create<Unit>(async _ => await EditActionAsync());
         }
 
         /// <inheritdoc />
         protected override void HandleActivation(CompositeDisposable disposables)
         {
             this.WhenAnyValue(x => x.SelectedProjects).Subscribe(_ => SelectedProjectsChanged()).DisposeWith(disposables);
-
             this.SelectedProject = this.ViewListItems.FirstOrDefault();
+
+            this.DataGridOnDoubleTapped = ReactiveCommand.Create<Unit>(async _ => await EditActionAsync());
+        }
+
+        /// <inheritdoc />
+        protected override void HandleDeactivation(CompositeDisposable disposables)
+        {
+            _serviceScope.DisposeWith(disposables);
         }
 
         private void InitializeProjectsSource()

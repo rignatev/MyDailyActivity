@@ -1,43 +1,96 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reactive;
+using System.Reactive.Disposables;
 
 using Client.Shared.ViewModels;
+
+using Contracts.Shared.Models;
+
+using Infrastructure.Shared.OperationResult;
+using Infrastructure.Shared.Utils;
+
+using Microsoft.Extensions.DependencyInjection;
 
 using MyDailyActivity.Activities;
 using MyDailyActivity.Projects;
 using MyDailyActivity.Tasks;
 
 using ReactiveUI;
+using ReactiveUI.Fody.Helpers;
+
+using Services.Contracts.Activities;
 
 namespace MyDailyActivity.MainWindow
 {
     public class MainWindowViewModel : ReactiveWindowViewModelBase
     {
         private readonly IServiceProvider _serviceProvider;
+        private readonly IServiceScope _serviceScope;
+        private readonly IActivityService _activityService;
+
+        [Reactive]
+        private DateTime StartDateTimeUtc { get; set; }
+
+        [Reactive]
+        private string Description { get; set; }
+
+        private ReactiveCommand<Unit, Unit> DoneCommand { get; }
 
         private IReadOnlyList<MenuItemViewModel> MenuItems { get; }
 
-        private ReactiveCommand<Unit, Unit> OpenActivitiesWindowViewCommand { get; }
+        private ReactiveCommand<Unit, Unit> OpenActivitiesWindowCommand { get; set; }
 
-        private ReactiveCommand<Unit, Unit> OpenProjectsWindowViewCommand { get; }
+        private ReactiveCommand<Unit, Unit> OpenProjectsWindowCommand { get; set; }
 
-        private ReactiveCommand<Unit, Unit> OpenTasksWindowViewCommand { get; }
-
-        public string Greeting => "Hello World!";
+        private ReactiveCommand<Unit, Unit> OpenTasksWindowCommand { get; set; }
 
         public MainWindowViewModel(IServiceProvider serviceProvider)
         {
             _serviceProvider = serviceProvider;
+            _serviceScope = serviceProvider.CreateScope();
+            _activityService = _serviceScope.ServiceProvider.GetRequiredService<IActivityService>();
 
-            this.OpenActivitiesWindowViewCommand = ReactiveCommand.Create(OpenActivitiesWindowView);
-            this.OpenProjectsWindowViewCommand = ReactiveCommand.Create(OpenProjectsWindowView);
-            this.OpenTasksWindowViewCommand = ReactiveCommand.Create(OpenTasksWindowView);
+            this.StartDateTimeUtc = DateTime.UtcNow;
+            this.Description = "Some description...";
+
+            IObservable<bool> canExecuteDoneCommand = this.WhenAnyValue(x => x.Description, description => description.IsNotNullOrEmpty());
+            this.DoneCommand = ReactiveCommand.Create(DoneCommandAction, canExecuteDoneCommand);
 
             this.MenuItems = CreateMenu();
         }
 
-        private void OpenActivitiesWindowView()
+        /// <inheritdoc />
+        protected override void HandleDeactivation(CompositeDisposable disposables)
+        {
+            _serviceScope.DisposeWith(disposables);
+        }
+
+        private void DoneCommandAction()
+        {
+            DateTime utcNow = DateTime.UtcNow;
+            var activity = new ActivityModel
+            {
+                CreatedDateTimeUtc = utcNow,
+                IsHidden = false,
+                Description = this.Description,
+                StartDateTimeUtc = this.StartDateTimeUtc,
+                EndDateTimeUtc = utcNow,
+                Duration = utcNow - this.StartDateTimeUtc
+            };
+
+            OperationResult<int> createResult = _activityService.Create(activity);
+            if (createResult.Success)
+            {
+                this.StartDateTimeUtc = utcNow;
+            }
+            else
+            {
+                ShowErrorDialog($"Failed to create activity: {createResult.Error.Message}");
+            }
+        }
+
+        private void OpenActivitiesWindowAction()
         {
             var activitiesWindow = new ActivitiesWindowView { DataContext = new ActivitiesWindowViewModel(_serviceProvider) };
 
@@ -47,7 +100,7 @@ namespace MyDailyActivity.MainWindow
             activitiesWindow.Show();
         }
 
-        private void OpenProjectsWindowView()
+        private void OpenProjectsWindowAction()
         {
             var projectsWindow = new ProjectsWindowView { DataContext = new ProjectsWindowViewModel(_serviceProvider) };
 
@@ -57,7 +110,7 @@ namespace MyDailyActivity.MainWindow
             projectsWindow.Show();
         }
 
-        private void OpenTasksWindowView()
+        private void OpenTasksWindowAction()
         {
             var tasksWindow = new TasksWindowView { DataContext = new TasksWindowViewModel(_serviceProvider) };
 
@@ -69,6 +122,10 @@ namespace MyDailyActivity.MainWindow
 
         private IReadOnlyList<MenuItemViewModel> CreateMenu()
         {
+            this.OpenActivitiesWindowCommand = ReactiveCommand.Create(OpenActivitiesWindowAction);
+            this.OpenProjectsWindowCommand = ReactiveCommand.Create(OpenProjectsWindowAction);
+            this.OpenTasksWindowCommand = ReactiveCommand.Create(OpenTasksWindowAction);
+
             return new[]
             {
                 new MenuItemViewModel
@@ -79,17 +136,17 @@ namespace MyDailyActivity.MainWindow
                         new MenuItemViewModel
                         {
                             Header = "_Activities",
-                            Command = this.OpenActivitiesWindowViewCommand
+                            Command = this.OpenActivitiesWindowCommand
                         },
                         new MenuItemViewModel
                         {
                             Header = "_Projects",
-                            Command = this.OpenProjectsWindowViewCommand
+                            Command = this.OpenProjectsWindowCommand
                         },
                         new MenuItemViewModel
                         {
                             Header = "_Tasks",
-                            Command = this.OpenTasksWindowViewCommand
+                            Command = this.OpenTasksWindowCommand
                         }
                     }
                 }

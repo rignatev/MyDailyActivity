@@ -59,6 +59,7 @@ namespace MyDailyActivity.Tasks
             }
         }
 
+        private readonly IServiceScope _serviceScope;
         private readonly ITaskService _taskService;
         private readonly SourceCache<TaskModel, int> _tasksSource = new(x => x.Id);
         private ReadOnlyObservableCollection<ViewListItem> _viewListItems;
@@ -74,7 +75,7 @@ namespace MyDailyActivity.Tasks
 
         public IObservable<IChangeSet<TaskModel, int>> TasksChanged { get; }
 
-        internal ReactiveCommand<Unit, Unit> DataGridOnDoubleTapped { get; set; }
+        internal ReactiveCommand<Unit, Unit> DataGridOnDoubleTapped { get; private set; }
 
         [Reactive]
         internal List<ViewListItem> SelectedTasks { get; set; } =
@@ -82,7 +83,8 @@ namespace MyDailyActivity.Tasks
 
         public TasksWindowViewModel(IServiceProvider serviceProvider)
         {
-            _taskService = serviceProvider.GetRequiredService<ITaskService>();
+            _serviceScope = serviceProvider.CreateScope();
+            _taskService = _serviceScope.ServiceProvider.GetRequiredService<ITaskService>();
 
             InitializeTasksSource();
             InitializeEditButtonsBar();
@@ -90,15 +92,21 @@ namespace MyDailyActivity.Tasks
 
             this.TasksChanged = _tasksSource.Connect().ObserveOn(RxApp.MainThreadScheduler);
 
-            this.DataGridOnDoubleTapped = ReactiveCommand.Create<Unit>(async _ => await EditActionAsync());
         }
 
         /// <inheritdoc />
         protected override void HandleActivation(CompositeDisposable disposables)
         {
             this.WhenAnyValue(x => x.SelectedTasks).Subscribe(_ => SelectedTasksChanged()).DisposeWith(disposables);
-
             this.SelectedTask = this.ViewListItems.FirstOrDefault();
+
+            this.DataGridOnDoubleTapped = ReactiveCommand.Create<Unit>(async _ => await EditActionAsync());
+        }
+
+        /// <inheritdoc />
+        protected override void HandleDeactivation(CompositeDisposable disposables)
+        {
+            _serviceScope.DisposeWith(disposables);
         }
 
         private void InitializeTasksSource()

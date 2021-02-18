@@ -44,6 +44,12 @@ namespace MyDailyActivity.Activities
 
             public string Description { get; }
 
+            public DateTime StartDateTime { get; }
+
+            public DateTime EndDateTime { get; }
+
+            public TimeSpan Duration { get; }
+
             public bool IsHidden { get; }
 
             public ViewListItem(ActivityModel activity)
@@ -52,11 +58,15 @@ namespace MyDailyActivity.Activities
                 this.CreatedDateTime = activity.CreatedDateTimeUtc.ToLocalTime();
                 this.ModifiedDateTime = activity.ModifiedDateTimeUtc?.ToLocalTime();
                 this.Description = activity.Description;
+                this.StartDateTime = activity.StartDateTimeUtc.ToLocalTime();
+                this.EndDateTime = activity.EndDateTimeUtc.ToLocalTime();
+                this.Duration = activity.Duration;
                 this.IsHidden = activity.IsHidden;
             }
         }
 
         private readonly IActivityService _activityService;
+        private readonly IServiceScope _serviceScope;
         private readonly SourceCache<ActivityModel, int> _activitiesSource = new(x => x.Id);
         private ReadOnlyObservableCollection<ViewListItem> _viewListItems;
 
@@ -79,7 +89,8 @@ namespace MyDailyActivity.Activities
 
         public ActivitiesWindowViewModel(IServiceProvider serviceProvider)
         {
-            _activityService = serviceProvider.GetRequiredService<IActivityService>();
+            _serviceScope = serviceProvider.CreateScope();
+            _activityService = _serviceScope.ServiceProvider.GetRequiredService<IActivityService>();
 
             InitializeActivitiesSource();
             InitializeEditButtonsBar();
@@ -96,6 +107,12 @@ namespace MyDailyActivity.Activities
             this.WhenAnyValue(x => x.SelectedActivities).Subscribe(_ => SelectedActivitiesChanged()).DisposeWith(disposables);
 
             this.SelectedActivity = this.ViewListItems.FirstOrDefault();
+        }
+
+        /// <inheritdoc />
+        protected override void HandleDeactivation(CompositeDisposable disposables)
+        {
+            _serviceScope.DisposeWith(disposables);
         }
 
         private void InitializeActivitiesSource()
