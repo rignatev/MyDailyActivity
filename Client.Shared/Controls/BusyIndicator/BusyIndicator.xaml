@@ -1,0 +1,29 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="Client.Shared.Controls.BusyIndicator.BusyIndicator">
+
+    <Border BorderThickness="0" Background="#80000000">
+        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+            <TextBlock
+                x:Name="TextBlock"
+                Margin="0"
+                TextWrapping="Wrap"
+                Text="{Binding Text, Mode=OneWay}"
+                IsVisible="{Binding TextIsVisible, Mode=OneWay}"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                FontSize="24"
+                FontWeight="Bold"
+                Foreground="{Binding Foreground, Mode=OneWay}" />
+
+            <ProgressBar
+                x:Name="ProgressBar"
+                IsIndeterminate="True"
+                Width="100"
+                Background="#80000000"
+                IsVisible="{Binding ProgressBarIsVisible, Mode=OneWay}"
+                Foreground="{Binding Foreground, Mode=OneWay}" />
+
+        </StackPanel>
+    </Border>
+</UserControl>
