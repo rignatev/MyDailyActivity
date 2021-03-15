@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Reactive;
 using System.Reactive.Disposables;
+
+using Avalonia.Controls;
 
 using Client.Shared.ViewModels;
 
@@ -28,6 +31,9 @@ namespace MyDailyActivity.MainWindow
         private readonly IServiceProvider _serviceProvider;
         private readonly IServiceScope _serviceScope;
         private readonly IActivityService _activityService;
+        private WindowBase _activitiesWindow;
+        private WindowBase _projectsWindow;
+        private WindowBase _tasksWindow;
 
         [Reactive]
         private DateTime StartDateTimeUtc { get; set; }
@@ -92,32 +98,69 @@ namespace MyDailyActivity.MainWindow
 
         private void OpenActivitiesWindowAction()
         {
+            if (_activitiesWindow != null)
+            {
+                _activitiesWindow.Activate();
+
+                return;
+            }
+
             var activitiesWindow = new ActivitiesWindowView { DataContext = new ActivitiesWindowViewModel(_serviceProvider) };
 
             activitiesWindow.ViewModel.ActivitiesChanged.Subscribe(activityChangeSet => Console.WriteLine(activityChangeSet.Count));
-            // activitiesWindow.Closing += ActivitiesWindowOnClosing;
-
+            activitiesWindow.Closing += ActivitiesWindowOnClosing;
             activitiesWindow.Show();
+
+            _activitiesWindow = activitiesWindow;
+        }
+
+        private void ActivitiesWindowOnClosing(object sender, CancelEventArgs e)
+        {
+            _activitiesWindow = null;
         }
 
         private void OpenProjectsWindowAction()
         {
+            if (_projectsWindow != null)
+            {
+                _projectsWindow.Activate();
+
+                return;
+            }
+
             var projectsWindow = new ProjectsWindowView { DataContext = new ProjectsWindowViewModel(_serviceProvider) };
-
             projectsWindow.ViewModel.ProjectsChanged.Subscribe(projectChangeSet => Console.WriteLine(projectChangeSet.Count));
-            // projectsWindow.Closing += ProjectsWindowOnClosing;
-
+            projectsWindow.Closing += ProjectsWindowOnClosing;
             projectsWindow.Show();
+
+            _projectsWindow = projectsWindow;
+        }
+
+        private void ProjectsWindowOnClosing(object sender, CancelEventArgs e)
+        {
+            _projectsWindow = null;
         }
 
         private void OpenTasksWindowAction()
         {
+            if (_tasksWindow != null)
+            {
+                _tasksWindow.Activate();
+
+                return;
+            }
+
             var tasksWindow = new TasksWindowView { DataContext = new TasksWindowViewModel(_serviceProvider) };
-
             tasksWindow.ViewModel.TasksChanged.Subscribe(taskChangeSet => Console.WriteLine(taskChangeSet.Count));
-            // tasksWindow.Closing += TasksWindowOnClosing;
-
+            tasksWindow.Closing += TasksWindowOnClosing;
             tasksWindow.Show();
+
+            _tasksWindow = tasksWindow;
+        }
+
+        private void TasksWindowOnClosing(object sender, CancelEventArgs e)
+        {
+            _tasksWindow = null;
         }
 
         private IReadOnlyList<MenuItemViewModel> CreateMenu()
