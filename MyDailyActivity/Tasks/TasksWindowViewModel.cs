@@ -7,6 +7,9 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 
+using Avalonia.Media;
+
+using Client.Shared.Controls.BusyIndicator;
 using Client.Shared.Controls.ButtonsBars;
 using Client.Shared.ViewModels;
 
@@ -16,7 +19,6 @@ using DynamicData;
 using DynamicData.Binding;
 
 using Infrastructure.Shared.OperationResult;
-using Infrastructure.Shared.Utils;
 
 using MessageBox.Avalonia.Enums;
 
@@ -62,7 +64,7 @@ namespace MyDailyActivity.Tasks
         private readonly IServiceScope _serviceScope;
         private readonly ITaskService _taskService;
         private readonly SourceCache<TaskModel, int> _tasksSource = new(x => x.Id);
-        private ReadOnlyObservableCollection<ViewListItem> _viewListItems;
+        private readonly ReadOnlyObservableCollection<ViewListItem> _viewListItems;
 
         private IEnumerable<ViewListItem> ViewListItems => _viewListItems;
 
@@ -75,7 +77,7 @@ namespace MyDailyActivity.Tasks
 
         public IObservable<IChangeSet<TaskModel, int>> TasksChanged { get; }
 
-        internal ReactiveCommand<Unit, Unit> DataGridOnDoubleTapped { get; private set; }
+        internal ReactiveCommand<Unit, Unit> DataGridOnDoubleTapped { get; }
 
         [Reactive]
         internal List<ViewListItem> SelectedTasks { get; set; } =
@@ -86,39 +88,6 @@ namespace MyDailyActivity.Tasks
             _serviceScope = serviceProvider.CreateScope();
             _taskService = _serviceScope.ServiceProvider.GetRequiredService<ITaskService>();
 
-            InitializeTasksSource();
-            InitializeEditButtonsBar();
-            InitializeBottomButtonsBar();
-
-            this.TasksChanged = _tasksSource.Connect().ObserveOn(RxApp.MainThreadScheduler);
-
-        }
-
-        /// <inheritdoc />
-        protected override void HandleActivation(CompositeDisposable disposables)
-        {
-            this.WhenAnyValue(x => x.SelectedTasks).Subscribe(_ => SelectedTasksChanged()).DisposeWith(disposables);
-            this.SelectedTask = this.ViewListItems.FirstOrDefault();
-
-            this.DataGridOnDoubleTapped = ReactiveCommand.Create<Unit>(async _ => await EditActionAsync());
-        }
-
-        /// <inheritdoc />
-        protected override void HandleDeactivation(CompositeDisposable disposables)
-        {
-            _serviceScope.DisposeWith(disposables);
-        }
-
-        private void InitializeTasksSource()
-        {
-            OperationResult<List<TaskModel>> getEntitiesResult =
-                _taskService.GetEntities(new EntityServiceGetEntitiesParameters<TaskModel, int>());
-
-            if (!getEntitiesResult.Success)
-            {
-                return;
-            }
-
             _tasksSource.Connect()
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Transform(x => new ViewListItem(x))
@@ -127,6 +96,55 @@ namespace MyDailyActivity.Tasks
                 .DisposeMany()
                 .Subscribe();
 
+            CreateEditButtonsBar();
+            CreateBottomButtonsBar();
+
+            ConfigureBusyIndicator(this.BusyIndicatorViewModel);
+
+            this.TasksChanged = _tasksSource.Connect().ObserveOn(RxApp.MainThreadScheduler);
+
+            this.DataGridOnDoubleTapped = ReactiveCommand.Create<Unit>(
+                async _ =>
+                {
+                    if (this.EditButtonsBarViewModel.CanExecuteEditCommand)
+                    {
+                        await EditActionAsync();
+                    }
+                }
+            );
+        }
+
+        /// <inheritdoc />
+        protected override void HandleActivation(CompositeDisposable disposables)
+        {
+            Observable.StartAsync(InitializeTasksSource);
+
+            this.WhenAnyValue(x => x.SelectedTasks).Subscribe(_ => SelectedTasksChanged()).DisposeWith(disposables);
+        }
+
+        /// <inheritdoc />
+        protected override void HandleDeactivation(CompositeDisposable disposables)
+        {
+            _serviceScope.DisposeWith(disposables);
+        }
+
+        static private void ConfigureBusyIndicator(BusyIndicatorViewModel busyIndicatorViewModel)
+        {
+            busyIndicatorViewModel.Text = "Wait...";
+            busyIndicatorViewModel.Foreground = new SolidColorBrush(Colors.White);
+        }
+
+        private async Task InitializeTasksSource()
+        {
+            OperationResult<List<TaskModel>> getEntitiesResult = await DoActionAsync(
+                () => _taskService.GetEntities(new EntityServiceGetEntitiesParameters<TaskModel, int>())
+            );
+
+            if (!getEntitiesResult.Success)
+            {
+                return;
+            }
+
             _tasksSource.Edit(
                 innerCache =>
                 {
@@ -134,9 +152,11 @@ namespace MyDailyActivity.Tasks
                     innerCache.AddOrUpdate(getEntitiesResult.Value);
                 }
             );
+
+            this.SelectedTask = this.ViewListItems.FirstOrDefault();
         }
 
-        private void InitializeEditButtonsBar()
+        private void CreateEditButtonsBar()
         {
             this.EditButtonsBarViewModel = new EditButtonsBarViewModel();
 
@@ -148,7 +168,7 @@ namespace MyDailyActivity.Tasks
             UpdateEditButtonsState();
         }
 
-        private void InitializeBottomButtonsBar()
+        private void CreateBottomButtonsBar()
         {
             this.BottomButtonsBarViewModel = new BottomButtonsBarViewModel(BottomButtonsBarViewModel.BarType.Close);
 
@@ -160,9 +180,20 @@ namespace MyDailyActivity.Tasks
             bool hasSelectedTask = this.SelectedTask != null;
             bool hasSelectedTasks = this.SelectedTasks.Count > 1;
 
-            this.EditButtonsBarViewModel.CanExecuteCopyCommand = hasSelectedTask && !hasSelectedTasks;
-            this.EditButtonsBarViewModel.CanExecuteEditCommand = hasSelectedTask && !hasSelectedTasks;
-            this.EditButtonsBarViewModel.CanExecuteDeleteCommand = hasSelectedTask || hasSelectedTasks;
+            if (this.IsBusy)
+            {
+                this.EditButtonsBarViewModel.CanExecuteCreateCommand = false;
+                this.EditButtonsBarViewModel.CanExecuteCopyCommand = false;
+                this.EditButtonsBarViewModel.CanExecuteEditCommand = false;
+                this.EditButtonsBarViewModel.CanExecuteDeleteCommand = false;
+            }
+            else
+            {
+                this.EditButtonsBarViewModel.CanExecuteCreateCommand = true;
+                this.EditButtonsBarViewModel.CanExecuteCopyCommand = hasSelectedTask && !hasSelectedTasks;
+                this.EditButtonsBarViewModel.CanExecuteEditCommand = hasSelectedTask && !hasSelectedTasks;
+                this.EditButtonsBarViewModel.CanExecuteDeleteCommand = hasSelectedTask || hasSelectedTasks;
+            }
         }
 
         private void SelectedTasksChanged()
@@ -182,7 +213,7 @@ namespace MyDailyActivity.Tasks
             }
 
             newTask = taskEditView.ViewModel.Model;
-            OperationResult<int> createResult = _taskService.Create(newTask);
+            OperationResult<int> createResult = await DoActionAsync(() => _taskService.Create(newTask));
 
             if (!createResult.Success)
             {
@@ -208,7 +239,7 @@ namespace MyDailyActivity.Tasks
             }
 
             TaskModel modifiedTask = taskEditView.ViewModel.Model;
-            OperationResult<int> createResult = _taskService.Create(modifiedTask);
+            OperationResult<int> createResult = await DoActionAsync(() => _taskService.Create(modifiedTask));
 
             if (!createResult.Success)
             {
@@ -234,7 +265,7 @@ namespace MyDailyActivity.Tasks
             }
 
             TaskModel modifiedTask = taskEditView.ViewModel.Model;
-            OperationResult updateResult = _taskService.Update(modifiedTask);
+            OperationResult updateResult = await DoActionAsync(() => _taskService.Update(modifiedTask));
 
             if (!updateResult.Success)
             {
@@ -260,28 +291,17 @@ namespace MyDailyActivity.Tasks
                 return;
             }
 
-            var deletedIds = new List<int>(this.SelectedTasks.Count);
+            List<int> selectedTaskIds = this.SelectedTasks.ConvertAll(x => x.Id);
+            OperationResult deleteRangeResult = _taskService.DeleteRange(selectedTaskIds);
 
-            foreach (ViewListItem selectedTask in this.SelectedTasks)
+            if (deleteRangeResult.Success)
             {
-                OperationResult deleteResult = _taskService.Delete(selectedTask.Id);
-
-                if (deleteResult.Success)
-                {
-                    deletedIds.Add(selectedTask.Id);
-                }
-                else
-                {
-                    await ShowErrorDialog(
-                        $"Fail to delete: {selectedTask.Name}.\n{deleteResult.Error.Message}",
-                        "Delete action"
-                    );
-                }
+                _tasksSource.RemoveKeys(selectedTaskIds);
             }
-
-            if (!deletedIds.IsNullOrEmpty())
+            else
             {
-                _tasksSource.RemoveKeys(deletedIds);
+                string failedIds = string.Join(",", selectedTaskIds);
+                await ShowErrorDialog($"Fail to delete: {failedIds}.\n{deleteRangeResult.Error.Message}", "Delete action");
             }
         }
 

@@ -7,6 +7,9 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 
+using Avalonia.Media;
+
+using Client.Shared.Controls.BusyIndicator;
 using Client.Shared.Controls.ButtonsBars;
 using Client.Shared.ViewModels;
 
@@ -16,7 +19,6 @@ using DynamicData;
 using DynamicData.Binding;
 
 using Infrastructure.Shared.OperationResult;
-using Infrastructure.Shared.Utils;
 
 using MessageBox.Avalonia.Enums;
 
@@ -62,7 +64,7 @@ namespace MyDailyActivity.Projects
         private readonly IServiceScope _serviceScope;
         private readonly IProjectService _projectService;
         private readonly SourceCache<ProjectModel, int> _projectsSource = new(x => x.Id);
-        private ReadOnlyObservableCollection<ViewListItem> _viewListItems;
+        private readonly ReadOnlyObservableCollection<ViewListItem> _viewListItems;
 
         private IEnumerable<ViewListItem> ViewListItems => _viewListItems;
 
@@ -75,7 +77,7 @@ namespace MyDailyActivity.Projects
 
         public IObservable<IChangeSet<ProjectModel, int>> ProjectsChanged { get; }
 
-        internal ReactiveCommand<Unit, Unit> DataGridOnDoubleTapped { get; private set; }
+        internal ReactiveCommand<Unit, Unit> DataGridOnDoubleTapped { get; }
 
         [Reactive]
         internal List<ViewListItem> SelectedProjects { get; set; } =
@@ -86,38 +88,6 @@ namespace MyDailyActivity.Projects
             _serviceScope = serviceProvider.CreateScope();
             _projectService = _serviceScope.ServiceProvider.GetRequiredService<IProjectService>();
 
-            InitializeProjectsSource();
-            InitializeEditButtonsBar();
-            InitializeBottomButtonsBar();
-
-            this.ProjectsChanged = _projectsSource.Connect().ObserveOn(RxApp.MainThreadScheduler);
-        }
-
-        /// <inheritdoc />
-        protected override void HandleActivation(CompositeDisposable disposables)
-        {
-            this.WhenAnyValue(x => x.SelectedProjects).Subscribe(_ => SelectedProjectsChanged()).DisposeWith(disposables);
-            this.SelectedProject = this.ViewListItems.FirstOrDefault();
-
-            this.DataGridOnDoubleTapped = ReactiveCommand.Create<Unit>(async _ => await EditActionAsync());
-        }
-
-        /// <inheritdoc />
-        protected override void HandleDeactivation(CompositeDisposable disposables)
-        {
-            _serviceScope.DisposeWith(disposables);
-        }
-
-        private void InitializeProjectsSource()
-        {
-            OperationResult<List<ProjectModel>> getEntitiesResult =
-                _projectService.GetEntities(new EntityServiceGetEntitiesParameters<ProjectModel, int>());
-
-            if (!getEntitiesResult.Success)
-            {
-                return;
-            }
-
             _projectsSource.Connect()
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Transform(x => new ViewListItem(x))
@@ -126,6 +96,55 @@ namespace MyDailyActivity.Projects
                 .DisposeMany()
                 .Subscribe();
 
+            CreateEditButtonsBar();
+            CreateBottomButtonsBar();
+
+            ConfigureBusyIndicator(this.BusyIndicatorViewModel);
+
+            this.ProjectsChanged = _projectsSource.Connect().ObserveOn(RxApp.MainThreadScheduler);
+
+            this.DataGridOnDoubleTapped = ReactiveCommand.Create<Unit>(
+                async _ =>
+                {
+                    if (this.EditButtonsBarViewModel.CanExecuteEditCommand)
+                    {
+                        await EditActionAsync();
+                    }
+                }
+            );
+        }
+
+        /// <inheritdoc />
+        protected override void HandleActivation(CompositeDisposable disposables)
+        {
+            Observable.StartAsync(InitializeProjectsSource);
+
+            this.WhenAnyValue(x => x.SelectedProjects).Subscribe(_ => SelectedProjectsChanged()).DisposeWith(disposables);
+        }
+
+        /// <inheritdoc />
+        protected override void HandleDeactivation(CompositeDisposable disposables)
+        {
+            _serviceScope.DisposeWith(disposables);
+        }
+
+        static private void ConfigureBusyIndicator(BusyIndicatorViewModel busyIndicatorViewModel)
+        {
+            busyIndicatorViewModel.Text = "Wait...";
+            busyIndicatorViewModel.Foreground = new SolidColorBrush(Colors.White);
+        }
+
+        private async Task InitializeProjectsSource()
+        {
+            OperationResult<List<ProjectModel>> getEntitiesResult = await DoActionAsync(
+                () => _projectService.GetEntities(new EntityServiceGetEntitiesParameters<ProjectModel, int>())
+            );
+
+            if (!getEntitiesResult.Success)
+            {
+                return;
+            }
+
             _projectsSource.Edit(
                 innerCache =>
                 {
@@ -133,9 +152,11 @@ namespace MyDailyActivity.Projects
                     innerCache.AddOrUpdate(getEntitiesResult.Value);
                 }
             );
+
+            this.SelectedProject = this.ViewListItems.FirstOrDefault();
         }
 
-        private void InitializeEditButtonsBar()
+        private void CreateEditButtonsBar()
         {
             this.EditButtonsBarViewModel = new EditButtonsBarViewModel();
 
@@ -147,7 +168,7 @@ namespace MyDailyActivity.Projects
             UpdateEditButtonsState();
         }
 
-        private void InitializeBottomButtonsBar()
+        private void CreateBottomButtonsBar()
         {
             this.BottomButtonsBarViewModel = new BottomButtonsBarViewModel(BottomButtonsBarViewModel.BarType.Close);
 
@@ -159,9 +180,20 @@ namespace MyDailyActivity.Projects
             bool hasSelectedProject = this.SelectedProject != null;
             bool hasSelectedProjects = this.SelectedProjects.Count > 1;
 
-            this.EditButtonsBarViewModel.CanExecuteCopyCommand = hasSelectedProject && !hasSelectedProjects;
-            this.EditButtonsBarViewModel.CanExecuteEditCommand = hasSelectedProject && !hasSelectedProjects;
-            this.EditButtonsBarViewModel.CanExecuteDeleteCommand = hasSelectedProject || hasSelectedProjects;
+            if (this.IsBusy)
+            {
+                this.EditButtonsBarViewModel.CanExecuteCreateCommand = false;
+                this.EditButtonsBarViewModel.CanExecuteCopyCommand = false;
+                this.EditButtonsBarViewModel.CanExecuteEditCommand = false;
+                this.EditButtonsBarViewModel.CanExecuteDeleteCommand = false;
+            }
+            else
+            {
+                this.EditButtonsBarViewModel.CanExecuteCreateCommand = true;
+                this.EditButtonsBarViewModel.CanExecuteCopyCommand = hasSelectedProject && !hasSelectedProjects;
+                this.EditButtonsBarViewModel.CanExecuteEditCommand = hasSelectedProject && !hasSelectedProjects;
+                this.EditButtonsBarViewModel.CanExecuteDeleteCommand = hasSelectedProject || hasSelectedProjects;
+            }
         }
 
         private void SelectedProjectsChanged()
@@ -181,7 +213,7 @@ namespace MyDailyActivity.Projects
             }
 
             newProject = projectEditView.ViewModel.Model;
-            OperationResult<int> createResult = _projectService.Create(newProject);
+            OperationResult<int> createResult = await DoActionAsync(() => _projectService.Create(newProject));
 
             if (!createResult.Success)
             {
@@ -207,7 +239,7 @@ namespace MyDailyActivity.Projects
             }
 
             ProjectModel modifiedProject = projectEditView.ViewModel.Model;
-            OperationResult<int> createResult = _projectService.Create(modifiedProject);
+            OperationResult<int> createResult = await DoActionAsync(() => _projectService.Create(modifiedProject));
 
             if (!createResult.Success)
             {
@@ -233,7 +265,7 @@ namespace MyDailyActivity.Projects
             }
 
             ProjectModel modifiedProject = projectEditView.ViewModel.Model;
-            OperationResult updateResult = _projectService.Update(modifiedProject);
+            OperationResult updateResult = await DoActionAsync(() => _projectService.Update(modifiedProject));
 
             if (!updateResult.Success)
             {
@@ -259,28 +291,17 @@ namespace MyDailyActivity.Projects
                 return;
             }
 
-            var deletedIds = new List<int>(this.SelectedProjects.Count);
+            List<int> selectedProjectIds = this.SelectedProjects.ConvertAll(x => x.Id);
+            OperationResult deleteRangeResult = _projectService.DeleteRange(selectedProjectIds);
 
-            foreach (ViewListItem selectedProject in this.SelectedProjects)
+            if (deleteRangeResult.Success)
             {
-                OperationResult deleteResult = _projectService.Delete(selectedProject.Id);
-
-                if (deleteResult.Success)
-                {
-                    deletedIds.Add(selectedProject.Id);
-                }
-                else
-                {
-                    await ShowErrorDialog(
-                        $"Fail to delete: {selectedProject.Name}.\n{deleteResult.Error.Message}",
-                        "Delete action"
-                    );
-                }
+                _projectsSource.RemoveKeys(selectedProjectIds);
             }
-
-            if (!deletedIds.IsNullOrEmpty())
+            else
             {
-                _projectsSource.RemoveKeys(deletedIds);
+                string failedIds = string.Join(",", selectedProjectIds);
+                await ShowErrorDialog($"Fail to delete: {failedIds}.\n{deleteRangeResult.Error.Message}", "Delete action");
             }
         }
 

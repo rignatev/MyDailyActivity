@@ -23,7 +23,7 @@ namespace MyDailyActivity.Projects
 
         private void DataGrid_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (e.Source is DataGrid dataGrid)
+            if (sender is DataGrid dataGrid)
             {
                 this.ViewModel.SelectedProjects = dataGrid.SelectedItems.Cast<ProjectsWindowViewModel.ViewListItem>().ToList();
             }

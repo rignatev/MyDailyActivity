@@ -1,6 +1,7 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:buttonsBars="clr-namespace:Client.Shared.Controls.ButtonsBars;assembly=Client.Shared"
+        xmlns:busyIndicator="clr-namespace:Client.Shared.Controls.BusyIndicator;assembly=Client.Shared"
         x:Class="MyDailyActivity.Projects.ProjectsWindowView"
         Icon="/Assets/avalonia-logo.ico"
         Title="Projects"
@@ -11,6 +12,13 @@
             Grid.Column="0" Grid.Row="0"
             DataContext="{Binding EditButtonsBarViewModel}"
             Margin="10,10,10,0" />
+
+        <busyIndicator:BusyIndicator 
+            Grid.Column="0" Grid.Row="1"
+            DataContext="{Binding BusyIndicatorViewModel}"
+            Margin="10,10,10,0"
+            ZIndex="100"
+            IsVisible="{Binding IsVisible}" />
 
         <DataGrid
             Grid.Column="0" Grid.Row="1"
