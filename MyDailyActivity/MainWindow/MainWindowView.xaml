@@ -25,8 +25,11 @@
             <Grid Grid.Column="0" Grid.Row="0" Margin="10,10,10,0" ColumnDefinitions="Auto,1*,Auto,Auto,1*,Auto" RowDefinitions="*">
                 <TextBlock Text="Project" Grid.Column="0" Grid.Row="0" VerticalAlignment="Center" />
                 <AutoCompleteBox
-                    x:Name="ProjectAutoCompleteBox"
                     Grid.Column="1" Grid.Row="0"
+                    Items="{Binding ProjectItems, Mode=OneWay}"
+                    ValueMemberBinding="{Binding Name}"
+                    SelectedItem="{Binding SelectedProject, Mode=TwoWay}"
+                    Text="{Binding ProjectText, Mode=OneWayToSource}"
                     Margin="5,0,0,0"
                     MinWidth="80"
                     FilterMode="Contains" />
@@ -34,8 +37,11 @@
 
                 <TextBlock Text="Task" Grid.Column="3" Grid.Row="0" Margin="10,0,0,0" VerticalAlignment="Center" />
                 <AutoCompleteBox
-                    x:Name="TaskAutoCompleteBox"
                     Grid.Column="4" Grid.Row="0"
+                    Items="{Binding TaskItems, Mode=OneWay}"
+                    ValueMemberBinding="{Binding Name}"
+                    SelectedItem="{Binding SelectedTask, Mode=TwoWay}"
+                    Text="{Binding TaskText, Mode=OneWayToSource}"
                     Margin="5,0,0,0"
                     MinWidth="80"
                     FilterMode="Contains" />

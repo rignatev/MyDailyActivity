@@ -43,6 +43,8 @@
                 <DataGridTextColumn Header="Start Date" Binding="{Binding StartDateTime}" Width="Auto" />
                 <DataGridTextColumn Header="End Date" Binding="{Binding EndDateTime}" Width="Auto" />
                 <DataGridTextColumn Header="Duration" Binding="{Binding Duration}" Width="Auto" />
+                <DataGridTextColumn Header="Project" Binding="{Binding ProjectName}" Width="Auto" />
+                <DataGridTextColumn Header="Task" Binding="{Binding TaskName}" Width="Auto" />
                 <DataGridTextColumn Header="Created" Binding="{Binding CreatedDateTime}" Width="Auto" />
                 <DataGridTextColumn Header="Modified" Binding="{Binding ModifiedDateTime}" Width="Auto" />
             </DataGrid.Columns>

@@ -52,6 +52,10 @@ namespace MyDailyActivity.Activities
 
             public TimeSpan Duration { get; }
 
+            public string ProjectName { get; set; }
+
+            public string TaskName { get; set; }
+
             public bool IsHidden { get; }
 
             public ViewListItem(ActivityModel activity)
@@ -63,6 +67,8 @@ namespace MyDailyActivity.Activities
                 this.StartDateTime = activity.StartDateTimeUtc.ToLocalTime();
                 this.EndDateTime = activity.EndDateTimeUtc.ToLocalTime();
                 this.Duration = activity.Duration;
+                this.ProjectName = activity.Project?.Name;
+                this.TaskName = activity.Task?.Name;
                 this.IsHidden = activity.IsHidden;
             }
         }
@@ -144,7 +150,12 @@ namespace MyDailyActivity.Activities
         private async Task InitializeActivitiesSource()
         {
             OperationResult<List<ActivityModel>> getEntitiesResult = await DoActionAsync(
-                () => _activityService.GetEntities(new EntityServiceGetEntitiesParameters<ActivityModel, int>())
+                () =>
+                {
+                    var getEntitiesParameters = new EntityServiceGetEntitiesParameters<ActivityModel, int> { IncludeRelated = true };
+
+                    return _activityService.GetEntities(getEntitiesParameters);
+                }
             );
 
             if (!getEntitiesResult.Success)
