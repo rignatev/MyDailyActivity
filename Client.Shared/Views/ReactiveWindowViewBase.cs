@@ -25,6 +25,11 @@ namespace Client.Shared.Views
 
         private void HandleActivation(CompositeDisposable disposables)
         {
+            if (this.ViewModel == null)
+            {
+                throw new Exception($"{nameof(this.ViewModel)} is null.");
+            }
+
             this.ViewModel.OwnerWindow = (Window)this.VisualRoot;
 
             this.WhenAnyObservable(x => x.ViewModel.ViewCloseCommand)
@@ -32,15 +37,15 @@ namespace Client.Shared.Views
                 .Subscribe(_ => Close())
                 .DisposeWith(disposables);
 
-            InitializeEvents(disposables);
+            InitializeEvents(this.ViewModel, disposables);
 
             HandleActivationCore(disposables);
         }
 
-        private void InitializeEvents(CompositeDisposable disposables)
+        private void InitializeEvents(TViewModel viewModel, CompositeDisposable disposables)
         {
-            this.Events().Closing.Subscribe(async pattern => await this.ViewModel.OnClosingAsync(pattern)).DisposeWith(disposables);
-            this.Events().Closing.Subscribe(pattern => this.ViewModel.OnClosing(pattern)).DisposeWith(disposables);
+            this.Events().Closing.Subscribe(async pattern => await viewModel.OnClosingAsync(pattern)).DisposeWith(disposables);
+            this.Events().Closing.Subscribe(viewModel.OnClosing).DisposeWith(disposables);
         }
     }
 }
