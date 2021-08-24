@@ -22,9 +22,9 @@ namespace Services
             serviceCollection.AddScoped<IActivityService, ActivityService>();
         }
 
-        static public void InitializeDb()
+        static public void InitializeDb(string connectionString)
         {
-            DataServicesConfigurator.InitializeDb();
+            DataServicesConfigurator.InitializeDb(connectionString);
         }
     }
 }

@@ -15,7 +15,7 @@ namespace Contracts.Shared.Models
 
         /// <inheritdoc />
         public TaskModel CopyModelForCreate(DateTime? createdDateTimeUtc = null) =>
-            new()
+            new TaskModel
             {
                 Id = default,
                 CreatedDateTimeUtc = createdDateTimeUtc ?? DateTime.UtcNow,
@@ -27,7 +27,7 @@ namespace Contracts.Shared.Models
 
         /// <inheritdoc />
         public TaskModel CopyModelForEdit(DateTime? modifiedDateTimeUtc = null) =>
-            new()
+            new TaskModel
             {
                 Id = this.Id,
                 CreatedDateTimeUtc = this.CreatedDateTimeUtc,

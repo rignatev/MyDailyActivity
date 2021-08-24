@@ -14,7 +14,6 @@ namespace Data.EF.Core.OperationScopes
         /// <inheritdoc />
         public ModificationScope(IServiceProvider serviceProvider) : base(serviceProvider)
         {
-            ScopeLock.EnterWriteLock();
             _transaction = this.DbContext.Database.BeginTransaction();
         }
 
@@ -67,7 +66,6 @@ namespace Data.EF.Core.OperationScopes
             if (disposing)
             {
                 _transaction.Dispose();
-                ScopeLock.ExitWriteLock();
             }
 
             _disposed = true;

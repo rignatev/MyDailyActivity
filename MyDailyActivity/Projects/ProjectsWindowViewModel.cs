@@ -63,7 +63,7 @@ namespace MyDailyActivity.Projects
 
         private readonly IServiceScope _serviceScope;
         private readonly IProjectService _projectService;
-        private readonly SourceCache<ProjectModel, int> _projectsSource = new(x => x.Id);
+        private readonly SourceCache<ProjectModel, int> _projectsSource = new SourceCache<ProjectModel, int>(x => x.Id);
         private readonly ReadOnlyObservableCollection<ViewListItem> _viewListItems;
 
         private IEnumerable<ViewListItem> ViewListItems => _viewListItems;
@@ -80,8 +80,7 @@ namespace MyDailyActivity.Projects
         internal ReactiveCommand<Unit, Unit> DataGridOnDoubleTapped { get; }
 
         [Reactive]
-        internal List<ViewListItem> SelectedProjects { get; set; } =
-            new();
+        internal List<ViewListItem> SelectedProjects { get; set; } = new List<ViewListItem>();
 
         public ProjectsWindowViewModel(IServiceProvider serviceProvider)
         {
@@ -207,7 +206,7 @@ namespace MyDailyActivity.Projects
             var projectEditView = new ProjectEditView { DataContext = new ProjectEditViewModel(newProject) };
             await projectEditView.ShowDialog(this.OwnerWindow);
 
-            if (!projectEditView.ViewModel.IsSuccess)
+            if (!projectEditView.ViewModel!.IsSuccess)
             {
                 return;
             }
@@ -233,7 +232,7 @@ namespace MyDailyActivity.Projects
             var projectEditView = new ProjectEditView { DataContext = new ProjectEditViewModel(projectCopy) };
             await projectEditView.ShowDialog(this.OwnerWindow);
 
-            if (!projectEditView.ViewModel.IsSuccess)
+            if (!projectEditView.ViewModel!.IsSuccess)
             {
                 return;
             }
@@ -259,7 +258,7 @@ namespace MyDailyActivity.Projects
             var projectEditView = new ProjectEditView { DataContext = new ProjectEditViewModel(projectCopy) };
             await projectEditView.ShowDialog(this.OwnerWindow);
 
-            if (!projectEditView.ViewModel.IsSuccess)
+            if (!projectEditView.ViewModel!.IsSuccess)
             {
                 return;
             }

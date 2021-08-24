@@ -15,7 +15,7 @@ namespace Contracts.Shared.Models
 
         /// <inheritdoc />
         public ProjectModel CopyModelForCreate(DateTime? createdDateTimeUtc = null) =>
-            new()
+            new ProjectModel
             {
                 Id = default,
                 CreatedDateTimeUtc = createdDateTimeUtc ?? DateTime.UtcNow,
@@ -27,7 +27,7 @@ namespace Contracts.Shared.Models
 
         /// <inheritdoc />
         public ProjectModel CopyModelForEdit(DateTime? modifiedDateTimeUtc = null) =>
-            new()
+            new ProjectModel
             {
                 Id = this.Id,
                 CreatedDateTimeUtc = this.CreatedDateTimeUtc,

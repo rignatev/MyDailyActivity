@@ -63,7 +63,7 @@ namespace MyDailyActivity.Tasks
 
         private readonly IServiceScope _serviceScope;
         private readonly ITaskService _taskService;
-        private readonly SourceCache<TaskModel, int> _tasksSource = new(x => x.Id);
+        private readonly SourceCache<TaskModel, int> _tasksSource = new SourceCache<TaskModel, int>(x => x.Id);
         private readonly ReadOnlyObservableCollection<ViewListItem> _viewListItems;
 
         private IEnumerable<ViewListItem> ViewListItems => _viewListItems;
@@ -80,8 +80,7 @@ namespace MyDailyActivity.Tasks
         internal ReactiveCommand<Unit, Unit> DataGridOnDoubleTapped { get; }
 
         [Reactive]
-        internal List<ViewListItem> SelectedTasks { get; set; } =
-            new();
+        internal List<ViewListItem> SelectedTasks { get; set; } = new List<ViewListItem>();
 
         public TasksWindowViewModel(IServiceProvider serviceProvider)
         {
@@ -207,7 +206,7 @@ namespace MyDailyActivity.Tasks
             var taskEditView = new TaskEditView { DataContext = new TaskEditViewModel(newTask) };
             await taskEditView.ShowDialog(this.OwnerWindow);
 
-            if (!taskEditView.ViewModel.IsSuccess)
+            if (!taskEditView.ViewModel!.IsSuccess)
             {
                 return;
             }
@@ -233,7 +232,7 @@ namespace MyDailyActivity.Tasks
             var taskEditView = new TaskEditView { DataContext = new TaskEditViewModel(taskCopy) };
             await taskEditView.ShowDialog(this.OwnerWindow);
 
-            if (!taskEditView.ViewModel.IsSuccess)
+            if (!taskEditView.ViewModel!.IsSuccess)
             {
                 return;
             }
@@ -259,7 +258,7 @@ namespace MyDailyActivity.Tasks
             var taskEditView = new TaskEditView { DataContext = new TaskEditViewModel(taskCopy) };
             await taskEditView.ShowDialog(this.OwnerWindow);
 
-            if (!taskEditView.ViewModel.IsSuccess)
+            if (!taskEditView.ViewModel!.IsSuccess)
             {
                 return;
             }

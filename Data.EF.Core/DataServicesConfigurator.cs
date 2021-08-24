@@ -26,9 +26,9 @@ namespace Data.EF.Core
             serviceCollection.AddScoped<IActivityDataService, ActivityDataService<AppDbContext>>();
         }
 
-        static public void InitializeDb()
+        static public void InitializeDb(string connectionString)
         {
-            new Migrator("Data Source=data.sqlite", typeof(M0_Initial).Assembly)
+            new Migrator(connectionString, typeof(M0_Initial).Assembly)
                 .UpdateDatabase();
         }
     }

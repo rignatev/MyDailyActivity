@@ -1,3 +1,4 @@
+using System;
 using System.Reactive.Disposables;
 
 using Avalonia.Controls;
@@ -23,6 +24,11 @@ namespace Client.Shared.Views
 
         private void HandleActivation(CompositeDisposable disposables)
         {
+            if (this.ViewModel == null)
+            {
+                throw new Exception($"{nameof(this.ViewModel)} is null.");
+            }
+
             this.ViewModel.OwnerWindow = (Window)this.VisualRoot;
 
             HandleActivationCore(disposables);

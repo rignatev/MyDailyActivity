@@ -42,8 +42,8 @@ namespace MyDailyActivity.MainWindow
         private readonly IActivityService _activityService;
         private readonly IProjectService _projectService;
         private readonly ITaskService _taskService;
-        private readonly SourceCache<ProjectModel, int> _projectsSource = new(x => x.Id);
-        private readonly SourceCache<TaskModel, int> _tasksSource = new(x => x.Id);
+        private readonly SourceCache<ProjectModel, int> _projectsSource = new SourceCache<ProjectModel, int>(x => x.Id);
+        private readonly SourceCache<TaskModel, int> _tasksSource = new SourceCache<TaskModel, int>(x => x.Id);
         private readonly ReadOnlyObservableCollection<ProjectModel> _projectItems;
         private readonly ReadOnlyObservableCollection<TaskModel> _tasksItems;
 
@@ -231,7 +231,7 @@ namespace MyDailyActivity.MainWindow
 
             var activitiesWindow = new ActivitiesWindowView { DataContext = new ActivitiesWindowViewModel(_serviceProvider) };
 
-            activitiesWindow.ViewModel.ActivitiesChanged.Subscribe(activityChangeSet => Console.WriteLine(activityChangeSet.Count));
+            activitiesWindow.ViewModel!.ActivitiesChanged.Subscribe(activityChangeSet => Console.WriteLine(activityChangeSet.Count));
             activitiesWindow.Closing += ActivitiesWindowOnClosing;
             activitiesWindow.Show();
 
@@ -253,7 +253,7 @@ namespace MyDailyActivity.MainWindow
             }
 
             var projectsWindow = new ProjectsWindowView { DataContext = new ProjectsWindowViewModel(_serviceProvider) };
-            projectsWindow.ViewModel.ProjectsChanged.Subscribe(_ => Observable.StartAsync(InitializeProjectItems));
+            projectsWindow.ViewModel!.ProjectsChanged.Subscribe(_ => Observable.StartAsync(InitializeProjectItems));
             projectsWindow.Closing += ProjectsWindowOnClosing;
             projectsWindow.Show();
 
@@ -275,7 +275,7 @@ namespace MyDailyActivity.MainWindow
             }
 
             var tasksWindow = new TasksWindowView { DataContext = new TasksWindowViewModel(_serviceProvider) };
-            tasksWindow.ViewModel.TasksChanged.Subscribe(_ => Observable.StartAsync(InitializeTaskItems));
+            tasksWindow.ViewModel!.TasksChanged.Subscribe(_ => Observable.StartAsync(InitializeTaskItems));
             tasksWindow.Closing += TasksWindowOnClosing;
             tasksWindow.Show();
 

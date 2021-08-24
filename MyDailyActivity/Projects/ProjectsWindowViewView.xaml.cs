@@ -25,13 +25,13 @@ namespace MyDailyActivity.Projects
         {
             if (sender is DataGrid dataGrid)
             {
-                this.ViewModel.SelectedProjects = dataGrid.SelectedItems.Cast<ProjectsWindowViewModel.ViewListItem>().ToList();
+                this.ViewModel!.SelectedProjects = dataGrid.SelectedItems.Cast<ProjectsWindowViewModel.ViewListItem>().ToList();
             }
         }
 
         private void DataGrid_OnDoubleTapped(object sender, RoutedEventArgs e)
         {
-            this.ViewModel.DataGridOnDoubleTapped.Execute().Subscribe();
+            this.ViewModel!.DataGridOnDoubleTapped.Execute().Subscribe();
         }
     }
 }

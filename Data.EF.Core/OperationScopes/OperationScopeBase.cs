@@ -9,7 +9,6 @@ namespace Data.EF.Core.OperationScopes
     public abstract class OperationScopeBase<TDbContext> : IDisposable
         where TDbContext : DbContext
     {
-        static protected readonly ReaderWriterLockSlim ScopeLock = new();
         private readonly IServiceScope _serviceScope;
         private bool _disposed;
 

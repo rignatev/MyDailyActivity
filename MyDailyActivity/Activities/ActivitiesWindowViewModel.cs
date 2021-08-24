@@ -75,7 +75,7 @@ namespace MyDailyActivity.Activities
 
         private readonly IActivityService _activityService;
         private readonly IServiceScope _serviceScope;
-        private readonly SourceCache<ActivityModel, int> _activitiesSource = new(x => x.Id);
+        private readonly SourceCache<ActivityModel, int> _activitiesSource = new SourceCache<ActivityModel, int>(x => x.Id);
         private readonly ReadOnlyObservableCollection<ViewListItem> _viewListItems;
 
         private IEnumerable<ViewListItem> ViewListItems => _viewListItems;
@@ -92,8 +92,7 @@ namespace MyDailyActivity.Activities
         internal ReactiveCommand<Unit, Unit> DataGridOnDoubleTapped { get; }
 
         [Reactive]
-        internal List<ViewListItem> SelectedActivities { get; set; } =
-            new();
+        internal List<ViewListItem> SelectedActivities { get; set; } = new List<ViewListItem>();
 
         public ActivitiesWindowViewModel(IServiceProvider serviceProvider)
         {
@@ -225,7 +224,7 @@ namespace MyDailyActivity.Activities
             var activityEditView = new ActivityEditView { DataContext = new ActivityEditViewModel(newActivity) };
             await activityEditView.ShowDialog(this.OwnerWindow);
 
-            if (!activityEditView.ViewModel.IsSuccess)
+            if (!activityEditView.ViewModel!.IsSuccess)
             {
                 return;
             }
@@ -251,7 +250,7 @@ namespace MyDailyActivity.Activities
             var activityEditView = new ActivityEditView { DataContext = new ActivityEditViewModel(activityCopy) };
             await activityEditView.ShowDialog(this.OwnerWindow);
 
-            if (!activityEditView.ViewModel.IsSuccess)
+            if (!activityEditView.ViewModel!.IsSuccess)
             {
                 return;
             }
@@ -277,7 +276,7 @@ namespace MyDailyActivity.Activities
             var activityEditView = new ActivityEditView { DataContext = new ActivityEditViewModel(activityCopy) };
             await activityEditView.ShowDialog(this.OwnerWindow);
 
-            if (!activityEditView.ViewModel.IsSuccess)
+            if (!activityEditView.ViewModel!.IsSuccess)
             {
                 return;
             }

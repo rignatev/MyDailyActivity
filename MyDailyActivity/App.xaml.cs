@@ -30,11 +30,13 @@ namespace MyDailyActivity
                     .Build();
 
                 var serviceCollection = new ServiceCollection();
-                ServicesConfigurator.ConfigureServices(serviceCollection, configuration.GetConnectionString("Sqlite"));
+                string connectionString = configuration.GetConnectionString("Sqlite");
+                
+                ServicesConfigurator.ConfigureServices(serviceCollection, connectionString);
+                ServicesConfigurator.InitializeDb(connectionString);
+
                 ServiceProvider serviceProvider = serviceCollection.BuildServiceProvider();
 
-                ServicesConfigurator.InitializeDb();
-                
                 desktop.MainWindow = new MainWindowView { DataContext = new MainWindowViewModel(serviceProvider) };
             }
 

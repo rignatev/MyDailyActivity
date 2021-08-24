@@ -278,10 +278,10 @@ namespace Data.EF.Core
             scope.DbContext.Set<TCustomEntityOrm>();
 
         protected ReaderScope<TDbContext> CreateReaderScope() =>
-            new(_serviceProvider);
+            new ReaderScope<TDbContext>(_serviceProvider);
 
         protected ModificationScope<TDbContext> CreateModificationScope() =>
-            new(_serviceProvider);
+            new ModificationScope<TDbContext>(_serviceProvider);
 
         static private Expression<Func<TEntityOrm, T>> ConvertToEntityOrmProperty<T>(Expression<Func<TEntity, T>> entityProperty)
         {

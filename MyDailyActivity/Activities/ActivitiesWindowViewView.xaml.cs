@@ -28,13 +28,13 @@ namespace MyDailyActivity.Activities
         {
             if (sender is DataGrid dataGrid)
             {
-                this.ViewModel.SelectedActivities = dataGrid.SelectedItems.Cast<ActivitiesWindowViewModel.ViewListItem>().ToList();
+                this.ViewModel!.SelectedActivities = dataGrid.SelectedItems.Cast<ActivitiesWindowViewModel.ViewListItem>().ToList();
             }
         }
 
         private void DataGrid_OnDoubleTapped(object sender, RoutedEventArgs e)
         {
-            this.ViewModel.DataGridOnDoubleTapped.Execute().ObserveOn(RxApp.MainThreadScheduler).Subscribe();
+            this.ViewModel!.DataGridOnDoubleTapped.Execute().ObserveOn(RxApp.MainThreadScheduler).Subscribe();
         }
     }
 }
