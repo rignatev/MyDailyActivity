@@ -19,8 +19,11 @@ namespace Data.EF.Core.Utils
                 EndDateTimeUtc = activityModel.EndDateTimeUtc,
                 Duration = activityModel.Duration,
                 Description = activityModel.Description,
-                Project = activityModel.Project?.ToProjectOrm(x => x),
-                Task = activityModel.Task?.ToTaskOrm(x => x),
+                ProjectId = activityModel.Project?.Id,
+                TaskId = activityModel.Task?.Id,
+                // TODO: After row version was added, Project and Task row versions always updating with activity.
+                // Project = activityModel.Project?.ToProjectOrm(x => x),
+                // Task = activityModel.Task?.ToTaskOrm(x => x),
                 IsHidden = activityModel.IsHidden
             };
     }

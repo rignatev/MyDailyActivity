@@ -168,6 +168,11 @@ namespace MyDailyActivity.MainWindow
                     }
                 );
             }
+
+            if (this.SelectedProject != null)
+            {
+                this.SelectedProject = _projectItems.FirstOrDefault(x => x.Id == this.SelectedProject.Id);
+            }
         }
 
         private async Task InitializeTaskItems()
@@ -191,6 +196,11 @@ namespace MyDailyActivity.MainWindow
                         innerCache.AddOrUpdate(activeTasks);
                     }
                 );
+            }
+
+            if (this.SelectedTask != null)
+            {
+                this.SelectedTask = _tasksItems.FirstOrDefault(x => x.Id == this.SelectedTask.Id);
             }
         }
 

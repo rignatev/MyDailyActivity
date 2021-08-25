@@ -230,11 +230,12 @@ namespace MyDailyActivity.Projects
                 return;
             }
 
-            newProject.Id = createResult.Value;
+            OperationResult<ProjectModel> getProjectResult = await DoActionAsync(() => _projectService.GetEntity(createResult.Value));
+            ProjectModel createdProject = getProjectResult.GetValueOrThrow();
 
-            _projectsSource.AddOrUpdate(newProject);
+            _projectsSource.AddOrUpdate(createdProject);
 
-            this.SelectedProject = this.ViewListItems.First(x => x.Id == newProject.Id);
+            this.SelectedProject = this.ViewListItems.First(x => x.Id == createdProject.Id);
         }
 
         private async Task CopyActionAsync()
@@ -256,11 +257,12 @@ namespace MyDailyActivity.Projects
                 return;
             }
 
-            modifiedProject.Id = createResult.Value;
+            OperationResult<ProjectModel> getProjectResult = await DoActionAsync(() => _projectService.GetEntity(createResult.Value));
+            ProjectModel createdProject = getProjectResult.GetValueOrThrow();
 
-            _projectsSource.AddOrUpdate(modifiedProject);
+            _projectsSource.AddOrUpdate(createdProject);
 
-            this.SelectedProject = this.ViewListItems.First(x => x.Id == modifiedProject.Id);
+            this.SelectedProject = this.ViewListItems.First(x => x.Id == createdProject.Id);
         }
 
         private async Task EditActionAsync()
@@ -282,9 +284,12 @@ namespace MyDailyActivity.Projects
                 return;
             }
 
-            _projectsSource.AddOrUpdate(modifiedProject);
+            OperationResult<ProjectModel> getProjectResult = await DoActionAsync(() => _projectService.GetEntity(modifiedProject.Id));
+            ProjectModel updatedProject = getProjectResult.GetValueOrThrow();
 
-            this.SelectedProject = this.ViewListItems.First(x => x.Id == modifiedProject.Id);
+            _projectsSource.AddOrUpdate(updatedProject);
+
+            this.SelectedProject = this.ViewListItems.First(x => x.Id == updatedProject.Id);
         }
 
         private async Task DeleteActionAsync()

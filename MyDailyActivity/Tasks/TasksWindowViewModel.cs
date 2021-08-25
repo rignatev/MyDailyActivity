@@ -230,11 +230,12 @@ namespace MyDailyActivity.Tasks
                 return;
             }
 
-            newTask.Id = createResult.Value;
+            OperationResult<TaskModel> getTaskResult = await DoActionAsync(() => _taskService.GetEntity(createResult.Value));
+            TaskModel createdTask = getTaskResult.GetValueOrThrow();
 
-            _tasksSource.AddOrUpdate(newTask);
+            _tasksSource.AddOrUpdate(createdTask);
 
-            this.SelectedTask = this.ViewListItems.First(x => x.Id == newTask.Id);
+            this.SelectedTask = this.ViewListItems.First(x => x.Id == createdTask.Id);
         }
 
         private async Task CopyActionAsync()
@@ -256,11 +257,12 @@ namespace MyDailyActivity.Tasks
                 return;
             }
 
-            modifiedTask.Id = createResult.Value;
+            OperationResult<TaskModel> getTaskResult = await DoActionAsync(() => _taskService.GetEntity(createResult.Value));
+            TaskModel createdTask = getTaskResult.GetValueOrThrow();
 
-            _tasksSource.AddOrUpdate(modifiedTask);
+            _tasksSource.AddOrUpdate(createdTask);
 
-            this.SelectedTask = this.ViewListItems.First(x => x.Id == modifiedTask.Id);
+            this.SelectedTask = this.ViewListItems.First(x => x.Id == createdTask.Id);
         }
 
         private async Task EditActionAsync()
@@ -282,9 +284,12 @@ namespace MyDailyActivity.Tasks
                 return;
             }
 
-            _tasksSource.AddOrUpdate(modifiedTask);
+            OperationResult<TaskModel> getTaskResult = await DoActionAsync(() => _taskService.GetEntity(modifiedTask.Id));
+            TaskModel updatedTask = getTaskResult.GetValueOrThrow();
 
-            this.SelectedTask = this.ViewListItems.First(x => x.Id == modifiedTask.Id);
+            _tasksSource.AddOrUpdate(updatedTask);
+
+            this.SelectedTask = this.ViewListItems.First(x => x.Id == updatedTask.Id);
         }
 
         private async Task DeleteActionAsync()

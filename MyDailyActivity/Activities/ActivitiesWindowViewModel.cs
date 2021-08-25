@@ -248,11 +248,12 @@ namespace MyDailyActivity.Activities
                 return;
             }
 
-            newActivity.Id = createResult.Value;
+            OperationResult<ActivityModel> getActivityResult = await DoActionAsync(() => _activityService.GetEntity(createResult.Value));
+            ActivityModel createdActivity = getActivityResult.GetValueOrThrow();
 
-            _activitiesSource.AddOrUpdate(newActivity);
+            _activitiesSource.AddOrUpdate(createdActivity);
 
-            this.SelectedActivity = this.ViewListItems.First(x => x.Id == newActivity.Id);
+            this.SelectedActivity = this.ViewListItems.First(x => x.Id == createdActivity.Id);
         }
 
         private async Task CopyActionAsync()
@@ -274,11 +275,12 @@ namespace MyDailyActivity.Activities
                 return;
             }
 
-            modifiedActivity.Id = createResult.Value;
+            OperationResult<ActivityModel> getActivityResult = await DoActionAsync(() => _activityService.GetEntity(createResult.Value));
+            ActivityModel createdActivity = getActivityResult.GetValueOrThrow();
 
-            _activitiesSource.AddOrUpdate(modifiedActivity);
+            _activitiesSource.AddOrUpdate(createdActivity);
 
-            this.SelectedActivity = this.ViewListItems.First(x => x.Id == modifiedActivity.Id);
+            this.SelectedActivity = this.ViewListItems.First(x => x.Id == createdActivity.Id);
         }
 
         private async Task EditActionAsync()
@@ -300,9 +302,14 @@ namespace MyDailyActivity.Activities
                 return;
             }
 
-            _activitiesSource.AddOrUpdate(modifiedActivity);
+            OperationResult<ActivityModel> getActivityResult =
+                await DoActionAsync(() => _activityService.GetEntity(modifiedActivity.Id, includeRelated: true));
 
-            this.SelectedActivity = this.ViewListItems.First(x => x.Id == modifiedActivity.Id);
+            ActivityModel updatedActivity = getActivityResult.GetValueOrThrow();
+
+            _activitiesSource.AddOrUpdate(updatedActivity);
+
+            this.SelectedActivity = this.ViewListItems.First(x => x.Id == updatedActivity.Id);
         }
 
         private async Task DeleteActionAsync()
