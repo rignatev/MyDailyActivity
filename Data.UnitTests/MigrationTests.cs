@@ -21,7 +21,7 @@ namespace Data.UnitTests
                 File.Delete(sqliteFileName);
             }
 
-            var migrator = new Migrator("Data Source=data.sqlite", typeof(M0_Initial).Assembly);
+            var migrator = new Migrator($"Data Source={sqliteFileName}", typeof(M0_Initial).Assembly);
             migrator.UpdateDatabase();
 
             File.Exists(sqliteFileName).Should().BeTrue();

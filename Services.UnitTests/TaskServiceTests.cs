@@ -1,117 +1,127 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
+using System.IO;
 
 using Contracts.Shared.Models;
 
-using Data.Migrations;
-using Data.Migrations.Migrations;
-
 using FluentAssertions;
+using FluentAssertions.Execution;
 
 using Infrastructure.Shared.OperationResult;
 
 using Microsoft.Extensions.DependencyInjection;
 
-using Services.Contracts.Activities;
-using Services.Contracts.EntityServices;
+using Services.Contracts.Tasks;
 
 using Xunit;
 
 namespace Services.UnitTests
 {
-    public class TaskServiceTests
+    public class TaskServiceTests : IDisposable
     {
-        [Fact]
-        public void Test1()
+        private readonly IServiceScope _serviceScope;
+
+        public TaskServiceTests()
         {
-            const string connectionString = "Data Source = testData.sqlite";
+            const string sqliteFileName = "testTaskServiceData.sqlite";
 
-            var migrator = new Migrator(connectionString, typeof(M0_Initial).Assembly);
-            migrator.UpdateDatabase();
+            if (File.Exists(sqliteFileName))
+            {
+                File.Delete(sqliteFileName);
+            }
 
+            var connectionString = $"Data Source = {sqliteFileName}";
             var serviceCollection = new ServiceCollection();
 
             ServicesConfigurator.ConfigureServices(serviceCollection, connectionString);
+            ServicesConfigurator.InitializeDb(connectionString);
 
             ServiceProvider serviceProvider = serviceCollection.BuildServiceProvider();
+            _serviceScope = serviceProvider.CreateScope();
+        }
 
-            using (IServiceScope serviceScope = serviceProvider.CreateScope())
+        [Fact]
+        public void TaskServiceCreate_Should_Success()
+        {
+            using var assertionScope = new AssertionScope();
+
+            var taskService = _serviceScope.ServiceProvider.GetRequiredService<ITaskService>();
+
+            var task = new TaskModel
             {
-                var random = new Random();
-                int rndValue = random.Next(minValue: 1, maxValue: 100);
-                DateTime nowUtc = DateTime.UtcNow.AddHours(rndValue);
+                Name = "Test task create",
+                Description = "Some description",
+                IsHidden = false,
+                CreatedDateTimeUtc = DateTime.UtcNow
+            };
 
-                var task = new TaskModel
-                {
-                    Name = "Test task",
-                    Description = "Some description",
-                    IsHidden = false,
-                    CreatedDateTimeUtc = nowUtc
-                };
+            OperationResult<int> taskCreateResult = taskService.Create(task);
 
-                var project = new ProjectModel
-                {
-                    Name = "Test project",
-                    Description = "Some project description",
-                    IsHidden = false,
-                    CreatedDateTimeUtc = nowUtc
-                };
+            taskCreateResult.Success.Should().BeTrue();
+        }
 
-                DateTime startDateTimeUtc = nowUtc.AddMinutes(value: -30);
+        [Fact]
+        public void TaskServiceUpdate_Should_Success()
+        {
+            using var assertionScope = new AssertionScope();
 
-                var activity = new ActivityModel
-                {
-                    Description = $"Test activity {rndValue}",
-                    CreatedDateTimeUtc = nowUtc,
-                    Task = task,
-                    Project = project,
-                    StartDateTimeUtc = startDateTimeUtc,
-                    EndDateTimeUtc = nowUtc,
-                    Duration = nowUtc - startDateTimeUtc,
-                    IsHidden = false
-                };
+            var taskService = _serviceScope.ServiceProvider.GetRequiredService<ITaskService>();
 
-                var activityService = serviceScope.ServiceProvider.GetRequiredService<IActivityService>();
-                
-                OperationResult<int> activityCreateResult = activityService.Create(activity);
+            var task = new TaskModel
+            {
+                Name = "Test task before update",
+                Description = "Some description",
+                IsHidden = false,
+                CreatedDateTimeUtc = DateTime.UtcNow
+            };
 
-                activityCreateResult.Success.Should().BeTrue();
+            OperationResult<int> taskCreateResult = taskService.Create(task);
+            taskCreateResult.Success.Should().BeTrue();
 
-                OperationResult<ActivityModel> activityGetResult = activityService.GetEntity(
-                    activityCreateResult.Value,
-                    includeRelated: true
-                );
+            OperationResult<TaskModel> taskGetEntityResult = taskService.GetEntity(id: taskCreateResult.Value);
+            taskGetEntityResult.Success.Should().BeTrue();
 
-                activityGetResult.Success.Should().BeTrue();
+            TaskModel modifiedTask = taskGetEntityResult.Value;
+            const string newName = "Test task after update";
+            modifiedTask.Name = newName;
 
-                ActivityModel activityFromDb = activityGetResult.Value;
-                activityFromDb.Project.Name = "Changed name";
-                activityFromDb.IsHidden = true;
-                activityFromDb.Task.IsHidden = true;
+            OperationResult taskUpdateResult = taskService.Update(modifiedTask);
+            taskUpdateResult.Success.Should().BeTrue();
 
-                OperationResult activityUpdateResult = activityService.Update(activityFromDb);
-                
-                activityUpdateResult.Success.Should().BeTrue();
+            taskGetEntityResult = taskService.GetEntity(id: modifiedTask.Id);
+            taskGetEntityResult.Success.Should().BeTrue();
+            taskGetEntityResult.Value.Name.Should().BeEquivalentTo(newName);
+        }
 
-                activityGetResult = activityService.GetEntity(
-                    activityFromDb.Id,
-                    includeRelated: true
-                );
-                
-                activityGetResult.Success.Should().BeTrue();
+        [Fact]
+        public void TaskServiceDelete_Should_Success()
+        {
+            using var assertionScope = new AssertionScope();
 
-                var parameters = new EntityServiceGetEntitiesParameters<ActivityModel, int>
-                {
-                    IncludeRelated = true,
-                    OrderByProperty = x => x.Task,
-                    OrderByDescending = false
-                };
+            var taskService = _serviceScope.ServiceProvider.GetRequiredService<ITaskService>();
 
-                OperationResult<List<ActivityModel>> activityGetEntitiesResult = activityService.GetEntities(parameters);
+            var task = new TaskModel
+            {
+                Name = "Test task delete",
+                Description = "Some description",
+                IsHidden = false,
+                CreatedDateTimeUtc = DateTime.UtcNow
+            };
 
-                activityGetEntitiesResult.Success.Should().BeTrue();
-            }
+            OperationResult<int> taskCreateResult = taskService.Create(task);
+            taskCreateResult.Success.Should().BeTrue();
+
+            OperationResult taskDeleteResult = taskService.Delete(id: taskCreateResult.Value);
+            taskDeleteResult.Success.Should().BeTrue();
+
+            OperationResult<TaskModel> taskGetEntityResult = taskService.GetEntity(id: taskCreateResult.Value);
+            taskGetEntityResult.Success.Should().BeTrue();
+            taskGetEntityResult.Value.Should().BeNull();
+        }
+
+        /// <inheritdoc />
+        public void Dispose()
+        {
+            _serviceScope.Dispose();
         }
     }
 }
