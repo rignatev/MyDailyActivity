@@ -36,8 +36,14 @@ namespace Client.Shared.ViewModels
                         {
                             this.BusyIndicatorViewModel.Hide();
                         }
+
+                        IsBusyChanged(this.IsBusy);
                     }
                 );
+        }
+
+        protected virtual void IsBusyChanged(bool isBusy)
+        {
         }
 
         public virtual async Task OnClosingAsync(CancelEventArgs eventPattern)

@@ -140,6 +140,12 @@ namespace MyDailyActivity.Activities
             _serviceScope.DisposeWith(disposables);
         }
 
+        /// <inheritdoc />
+        protected override void IsBusyChanged(bool isBusy)
+        {
+            UpdateEditButtonsState();
+        }
+
         static private void ConfigureBusyIndicator(BusyIndicatorViewModel busyIndicatorViewModel)
         {
             busyIndicatorViewModel.Text = "Wait...";
@@ -194,6 +200,11 @@ namespace MyDailyActivity.Activities
 
         private void UpdateEditButtonsState()
         {
+            if (this.EditButtonsBarViewModel == null)
+            {
+                return;
+            }
+
             bool hasSelectedActivity = this.SelectedActivity != null;
             bool hasSelectedActivities = this.SelectedActivities.Count > 1;
 
