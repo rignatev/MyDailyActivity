@@ -1,4 +1,6 @@
-﻿using Contracts.Shared.Models;
+﻿using System;
+
+using Contracts.Shared.Models;
 
 using Data.Contracts.Projects;
 
@@ -9,7 +11,8 @@ namespace Services.Projects
     public class ProjectService : EntityServiceBase<ProjectModel, int, IProjectDataService>, IProjectService
     {
         /// <inheritdoc />
-        public ProjectService(IProjectDataService entityDataService) : base(entityDataService)
+        public ProjectService(IServiceProvider serviceProvider, IProjectDataService entityDataService)
+            : base(serviceProvider, entityDataService)
         {
         }
     }

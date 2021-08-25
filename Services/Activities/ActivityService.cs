@@ -3,6 +3,7 @@
 using Contracts.Shared.Models;
 
 using Data.Contracts.Activities;
+using Data.EF.Core.OperationScopes;
 
 using Infrastructure.Shared.OperationResult;
 using Infrastructure.Shared.Utils;
@@ -14,14 +15,17 @@ namespace Services.Activities
     public class ActivityService : EntityServiceBase<ActivityModel, int, IActivityDataService>, IActivityService
     {
         /// <inheritdoc />
-        public ActivityService(IActivityDataService entityDataService) : base(entityDataService)
+        public ActivityService(IServiceProvider serviceProvider, IActivityDataService entityDataService) 
+            : base(serviceProvider, entityDataService)
         {
         }
 
         /// <inheritdoc />
         public OperationResult<ActivityModel> CreateInitialActivity()
         {
-            OperationResult<ActivityModel> getLatestActivityResult = this.EntityDataService.GetLatestActivity();
+            using DbReaderScope dbReaderScope = CreateReaderScope();
+
+            OperationResult<ActivityModel> getLatestActivityResult = this.EntityDataService.GetLatestActivity(dbReaderScope);
 
             var initialActivity = new ActivityModel();
 

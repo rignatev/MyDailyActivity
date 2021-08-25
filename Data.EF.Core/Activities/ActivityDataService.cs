@@ -4,6 +4,7 @@ using System.Linq;
 using Contracts.Shared.Models;
 
 using Data.Contracts.Activities;
+using Data.Contracts.OperationScopes;
 using Data.EF.Core.OperationScopes;
 using Data.EF.Core.Utils;
 
@@ -39,15 +40,14 @@ namespace Data.EF.Core.Activities
             entityIdType;
 
         /// <inheritdoc />
-        public OperationResult<ActivityModel> GetLatestActivity()
+        public OperationResult<ActivityModel> GetLatestActivity(IDbScope dbScope)
         {
             OperationResult<ActivityModel> result;
 
             try
             {
-                using ReaderScope<TDbContext> readerScope = CreateReaderScope();
-
-                DbSet<ActivityOrm> activityDbSet = GetEntityDbSet(readerScope);
+                TDbContext readerContext = GetReaderContext(dbScope);
+                DbSet<ActivityOrm> activityDbSet = GetEntityDbSet(readerContext);
 
                 ActivityOrm activityOrm = activityDbSet
                     .Include(x => x.Project)

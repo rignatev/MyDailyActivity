@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 using Data.Contracts.EntityDataServices;
 using Data.Contracts.EntityOrm;
+using Data.Contracts.OperationScopes;
 using Data.EF.Core.OperationScopes;
 using Data.EF.Core.Utils;
 
@@ -32,71 +33,18 @@ namespace Data.EF.Core
             _serviceProvider = serviceProvider;
 
         /// <inheritdoc />
-        public OperationResult<TEntityIdType> Create(TEntity entity)
-        {
-            using ModificationScope<TDbContext> modificationScope = CreateModificationScope();
-
-            return Create(entity, modificationScope);
-        }
-
-        /// <inheritdoc />
-        public OperationResult Update(TEntity entity)
-        {
-            using ModificationScope<TDbContext> modificationScope = CreateModificationScope();
-
-            return Update(entity, modificationScope);
-        }
-
-        /// <inheritdoc />
-        public OperationResult Delete(TEntityIdType id)
-        {
-            using ModificationScope<TDbContext> modificationScope = CreateModificationScope();
-
-            return Delete(id, modificationScope);
-        }
-
-        /// <inheritdoc />
-        public OperationResult DeleteRange(IEnumerable<TEntityIdType> ids)
-        {
-            using ModificationScope<TDbContext> modificationScope = CreateModificationScope();
-
-            return DeleteRange(ids, modificationScope);
-        }
-
-        /// <inheritdoc />
-        public OperationResult<TEntity> GetEntity(TEntityIdType id, bool includeRelated = false)
-        {
-            using ReaderScope<TDbContext> readerScope = CreateReaderScope();
-
-            return GetEntity(id, includeRelated, readerScope);
-        }
-
-        /// <inheritdoc />
-        public OperationResult<List<TEntity>> GetEntities(EntityDataServiceGetEntitiesParameters<TEntity, TEntityIdType> parameters)
-        {
-            using ReaderScope<TDbContext> readerScope = CreateReaderScope();
-
-            OperationResult<IEnumerable<TEntity>> result = GetEntities(parameters, readerScope);
-
-            if (result.Success)
-            {
-                return OperationResult<List<TEntity>>.Ok(result.Value.ToList());
-            }
-
-            return OperationResult<List<TEntity>>.Fail(result.Error);
-        }
-
-        protected OperationResult<TEntityIdType> Create(TEntity entity, ModificationScope<TDbContext> modificationScope)
+        public OperationResult<TEntityIdType> Create(TEntity entity, IDbModificationScope dbModificationScope)
         {
             OperationResult<TEntityIdType> result;
 
             try
             {
-                DbSet<TEntityOrm> entityDbSet = GetEntityDbSet(modificationScope);
+                TDbContext modificationContext = GetModificationContext(dbModificationScope);
+                DbSet<TEntityOrm> entityDbSet = GetEntityDbSet(modificationContext);
 
                 EntityEntry<TEntityOrm> updateResult = entityDbSet.Update(ConvertToEntityOrm(entity));
 
-                modificationScope.SaveChangesAndCommit();
+                dbModificationScope.SaveChangesAndCommit(modificationContext);
 
                 TEntityIdType entityId = ConvertToEntityId(updateResult.Entity.Id);
 
@@ -111,17 +59,19 @@ namespace Data.EF.Core
             return result;
         }
 
-        protected OperationResult Update(TEntity entity, ModificationScope<TDbContext> modificationScope)
+        /// <inheritdoc />
+        public OperationResult Update(TEntity entity, IDbModificationScope dbModificationScope)
         {
             OperationResult result;
 
             try
             {
-                DbSet<TEntityOrm> entityDbSet = GetEntityDbSet(modificationScope);
+                TDbContext modificationContext = GetModificationContext(dbModificationScope);
+                DbSet<TEntityOrm> entityDbSet = GetEntityDbSet(modificationContext);
 
                 entityDbSet.Update(ConvertToEntityOrm(entity));
 
-                modificationScope.SaveChangesAndCommit();
+                dbModificationScope.SaveChangesAndCommit(modificationContext);
 
                 result = OperationResult.Ok();
             }
@@ -134,17 +84,19 @@ namespace Data.EF.Core
             return result;
         }
 
-        protected OperationResult Delete(TEntityIdType id, ModificationScope<TDbContext> modificationScope)
+        /// <inheritdoc />
+        public OperationResult Delete(TEntityIdType id, IDbModificationScope dbModificationScope)
         {
             OperationResult result;
 
             try
             {
-                DbSet<TEntityOrm> entityDbSet = GetEntityDbSet(modificationScope);
+                TDbContext modificationContext = GetModificationContext(dbModificationScope);
+                DbSet<TEntityOrm> entityDbSet = GetEntityDbSet(modificationContext);
 
                 entityDbSet.Remove(new TEntityOrm { Id = ConvertToEntityOrmId(id) });
 
-                modificationScope.SaveChangesAndCommit();
+                dbModificationScope.SaveChangesAndCommit(modificationContext);
 
                 result = OperationResult.Ok();
             }
@@ -157,7 +109,8 @@ namespace Data.EF.Core
             return result;
         }
 
-        protected OperationResult DeleteRange(IEnumerable<TEntityIdType> ids, ModificationScope<TDbContext> modificationScope)
+        /// <inheritdoc />
+        public OperationResult DeleteRange(IEnumerable<TEntityIdType> ids, IDbModificationScope dbModificationScope)
         {
             OperationResult result;
 
@@ -168,13 +121,14 @@ namespace Data.EF.Core
                     throw new ArgumentNullException($"Argument {nameof(ids)} is null.");
                 }
 
-                DbSet<TEntityOrm> entityDbSet = GetEntityDbSet(modificationScope);
+                TDbContext modificationContext = GetModificationContext(dbModificationScope);
+                DbSet<TEntityOrm> entityDbSet = GetEntityDbSet(modificationContext);
 
                 IEnumerable<TEntityOrm> entities = ids.Select(id => new TEntityOrm { Id = ConvertToEntityOrmId(id) });
 
                 entityDbSet.RemoveRange(entities);
 
-                modificationScope.SaveChangesAndCommit();
+                dbModificationScope.SaveChangesAndCommit(modificationContext);
 
                 result = OperationResult.Ok();
             }
@@ -187,13 +141,15 @@ namespace Data.EF.Core
             return result;
         }
 
-        protected OperationResult<TEntity> GetEntity(TEntityIdType id, bool includeRelated, ReaderScope<TDbContext> readerScope)
+        /// <inheritdoc />
+        public OperationResult<TEntity> GetEntity(TEntityIdType id, bool includeRelated, IDbScope dbScope)
         {
             OperationResult<TEntity> result;
 
             try
             {
-                DbSet<TEntityOrm> entityDbSet = GetEntityDbSet(readerScope);
+                TDbContext readerContext = GetReaderContext(dbScope);
+                DbSet<TEntityOrm> entityDbSet = GetEntityDbSet(readerContext);
 
                 TEntityOrm entityOrm = includeRelated
                     ? entityDbSet.IncludeAll().FirstOrDefault(x => x.Id.Equals(id))
@@ -212,15 +168,17 @@ namespace Data.EF.Core
             return result;
         }
 
-        protected OperationResult<IEnumerable<TEntity>> GetEntities(
+        /// <inheritdoc />
+        public OperationResult<List<TEntity>> GetEntities(
             EntityDataServiceGetEntitiesParameters<TEntity, TEntityIdType> parameters,
-            ReaderScope<TDbContext> readerScope)
+            IDbScope dbScope)
         {
-            OperationResult<IEnumerable<TEntity>> result;
+            OperationResult<List<TEntity>> result;
 
             try
             {
-                IQueryable<TEntityOrm> query = GetEntityDbSet(readerScope).AsQueryable();
+                TDbContext readerContext = GetReaderContext(dbScope);
+                IQueryable<TEntityOrm> query = GetEntityDbSet(readerContext).AsQueryable();
 
                 if (parameters.Ids != null)
                 {
@@ -246,17 +204,17 @@ namespace Data.EF.Core
 
                 if (parameters.IncludeRelated)
                 {
-                    query = query.IncludeAll(readerScope.DbContext);
+                    query = query.IncludeAll(readerContext);
                 }
 
                 IEnumerable<TEntity> entities = query.AsEnumerable().Select(ConvertToEntity);
 
-                result = OperationResult<IEnumerable<TEntity>>.Ok(entities);
+                result = OperationResult<List<TEntity>>.Ok(entities.ToList());
             }
             catch (Exception exception)
             {
                 var error = new OperationError(exception);
-                result = OperationResult<IEnumerable<TEntity>>.Fail(error);
+                result = OperationResult<List<TEntity>>.Fail(error);
             }
 
             return result;
@@ -270,18 +228,18 @@ namespace Data.EF.Core
 
         protected abstract TEntityOrmIdType ConvertToEntityOrmId(TEntityIdType entityIdType);
 
-        static protected DbSet<TEntityOrm> GetEntityDbSet(OperationScopeBase<TDbContext> scope) =>
-            scope.DbContext.Set<TEntityOrm>();
+        static protected DbSet<TEntityOrm> GetEntityDbSet(TDbContext dbContext) =>
+            dbContext.Set<TEntityOrm>();
 
-        static protected DbSet<TCustomEntityOrm> GetEntityDbSet<TCustomEntityOrm>(OperationScopeBase<TDbContext> scope)
+        static protected DbSet<TCustomEntityOrm> GetEntityDbSet<TCustomEntityOrm>(TDbContext dbContext)
             where TCustomEntityOrm : class =>
-            scope.DbContext.Set<TCustomEntityOrm>();
+            dbContext.Set<TCustomEntityOrm>();
 
-        protected ReaderScope<TDbContext> CreateReaderScope() =>
-            new ReaderScope<TDbContext>(_serviceProvider);
+        protected TDbContext GetReaderContext(IDbScope dbScope) =>
+            dbScope.GetDbContext<TDbContext>();
 
-        protected ModificationScope<TDbContext> CreateModificationScope() =>
-            new ModificationScope<TDbContext>(_serviceProvider);
+        protected TDbContext GetModificationContext(IDbModificationScope dbModificationScope) =>
+            dbModificationScope.GetDbContext<TDbContext>();
 
         static private Expression<Func<TEntityOrm, T>> ConvertToEntityOrmProperty<T>(Expression<Func<TEntity, T>> entityProperty)
         {
