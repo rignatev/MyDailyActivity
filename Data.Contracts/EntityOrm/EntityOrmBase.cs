@@ -9,6 +9,9 @@ namespace Data.Contracts.EntityOrm
         public TEntityOrmIdType Id { get; set; }
 
         /// <inheritdoc />
+        public byte[] RowVersion { get; set; }
+
+        /// <inheritdoc />
         public DateTime CreatedDateTimeUtc { get; set; }
 
         /// <inheritdoc />

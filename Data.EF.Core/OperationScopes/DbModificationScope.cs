@@ -61,6 +61,24 @@ namespace Data.EF.Core.OperationScopes
             await _transaction.CommitAsync();
 
         /// <inheritdoc />
+        public void CommitIfSuccess(bool success)
+        {
+            if (success)
+            {
+                Commit();
+            }
+        }
+
+        /// <inheritdoc />
+        public async Task CommitIfSuccessAsync(bool success)
+        {
+            if (success)
+            {
+                await CommitAsync();
+            }
+        }
+
+        /// <inheritdoc />
         protected override void Dispose(bool disposing)
         {
             if (_disposed)

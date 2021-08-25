@@ -29,6 +29,7 @@ namespace Contracts.Shared.Models
             return new ActivityModel
             {
                 Id = default,
+                RowVersion = null,
                 CreatedDateTimeUtc = (DateTime)createdDateTimeUtc,
                 ModifiedDateTimeUtc = null,
                 Description = this.Description,
@@ -49,6 +50,7 @@ namespace Contracts.Shared.Models
             return new ActivityModel
             {
                 Id = this.Id,
+                RowVersion = this.RowVersion,
                 CreatedDateTimeUtc = this.CreatedDateTimeUtc,
                 ModifiedDateTimeUtc = (DateTime)modifiedDateTimeUtc,
                 Description = this.Description,

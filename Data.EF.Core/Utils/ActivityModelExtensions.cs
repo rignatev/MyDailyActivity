@@ -12,6 +12,7 @@ namespace Data.EF.Core.Utils
             new()
             {
                 Id = convertToActivityOrmId(activityModel.Id),
+                RowVersion = activityModel.RowVersion,
                 CreatedDateTimeUtc = activityModel.CreatedDateTimeUtc,
                 ModifiedDateTimeUtc = activityModel.ModifiedDateTimeUtc,
                 StartDateTimeUtc = activityModel.StartDateTimeUtc,

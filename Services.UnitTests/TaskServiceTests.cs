@@ -22,7 +22,7 @@ namespace Services.UnitTests
 
         public TaskServiceTests()
         {
-            const string sqliteFileName = "testTaskServiceData.sqlite";
+            const string sqliteFileName = "TaskServiceTests.sqlite";
 
             if (File.Exists(sqliteFileName))
             {
@@ -79,17 +79,18 @@ namespace Services.UnitTests
 
             OperationResult<TaskModel> taskGetEntityResult = taskService.GetEntity(id: taskCreateResult.Value);
             taskGetEntityResult.Success.Should().BeTrue();
+            taskGetEntityResult.Value.Should().NotBeNull();
 
             TaskModel modifiedTask = taskGetEntityResult.Value;
-            const string newName = "Test task after update";
-            modifiedTask.Name = newName;
+            modifiedTask.Name = "Test task after update";
 
             OperationResult taskUpdateResult = taskService.Update(modifiedTask);
             taskUpdateResult.Success.Should().BeTrue();
 
             taskGetEntityResult = taskService.GetEntity(id: modifiedTask.Id);
             taskGetEntityResult.Success.Should().BeTrue();
-            taskGetEntityResult.Value.Name.Should().BeEquivalentTo(newName);
+            taskGetEntityResult.Value.Should().NotBeNull();
+            taskGetEntityResult.Value.Name.Should().BeEquivalentTo(modifiedTask.Name);
         }
 
         [Fact]
@@ -114,6 +115,47 @@ namespace Services.UnitTests
             taskDeleteResult.Success.Should().BeTrue();
 
             OperationResult<TaskModel> taskGetEntityResult = taskService.GetEntity(id: taskCreateResult.Value);
+            taskGetEntityResult.Success.Should().BeTrue();
+            taskGetEntityResult.Value.Should().BeNull();
+        }
+
+        [Fact]
+        public void TaskServiceDeleteRange_Should_Success()
+        {
+            using var assertionScope = new AssertionScope();
+
+            var taskService = _serviceScope.ServiceProvider.GetRequiredService<ITaskService>();
+
+            var task1 = new TaskModel
+            {
+                Name = "Test task delete 1",
+                Description = "Some description",
+                IsHidden = false,
+                CreatedDateTimeUtc = DateTime.UtcNow
+            };
+
+            OperationResult<int> task1CreateResult = taskService.Create(task1);
+            task1CreateResult.Success.Should().BeTrue();
+
+            var task2 = new TaskModel
+            {
+                Name = "Test task delete 2",
+                Description = "Some description",
+                IsHidden = false,
+                CreatedDateTimeUtc = DateTime.UtcNow
+            };
+
+            OperationResult<int> task2CreateResult = taskService.Create(task2);
+            task2CreateResult.Success.Should().BeTrue();
+
+            OperationResult taskDeleteResult = taskService.DeleteRange(new[] { task1CreateResult.Value, task2CreateResult.Value });
+            taskDeleteResult.Success.Should().BeTrue();
+
+            OperationResult<TaskModel> taskGetEntityResult = taskService.GetEntity(id: task1CreateResult.Value);
+            taskGetEntityResult.Success.Should().BeTrue();
+            taskGetEntityResult.Value.Should().BeNull();
+
+            taskGetEntityResult = taskService.GetEntity(id: task2CreateResult.Value);
             taskGetEntityResult.Success.Should().BeTrue();
             taskGetEntityResult.Value.Should().BeNull();
         }

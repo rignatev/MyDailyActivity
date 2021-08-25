@@ -36,6 +36,8 @@ namespace Services
 
             OperationResult<TEntityIdType> dataServiceResult = this.EntityDataService.Create(entity, dbModificationScope);
 
+            dbModificationScope.CommitIfSuccess(dataServiceResult.Success);
+            
             return dataServiceResult.Success
                 ? OperationResult<TEntityIdType>.Ok(dataServiceResult.Value)
                 : OperationResult<TEntityIdType>.Fail(dataServiceResult.Error);
@@ -46,7 +48,11 @@ namespace Services
         {
             using DbModificationScope dbModificationScope = CreateModificationScope();
 
-            return this.EntityDataService.Update(entity, dbModificationScope);
+            OperationResult dataServiceResult = this.EntityDataService.Update(entity, dbModificationScope);
+
+            dbModificationScope.CommitIfSuccess(dataServiceResult.Success);
+
+            return dataServiceResult;
         }
 
         /// <inheritdoc />
@@ -54,7 +60,11 @@ namespace Services
         {
             using DbModificationScope dbModificationScope = CreateModificationScope();
 
-            return this.EntityDataService.Delete(id, dbModificationScope);
+            OperationResult dataServiceResult = this.EntityDataService.Delete(id, dbModificationScope);
+
+            dbModificationScope.CommitIfSuccess(dataServiceResult.Success);
+
+            return dataServiceResult;
         }
 
         /// <inheritdoc />
@@ -62,7 +72,11 @@ namespace Services
         {
             using DbModificationScope dbModificationScope = CreateModificationScope();
 
-            return this.EntityDataService.DeleteRange(ids, dbModificationScope);
+            OperationResult dataServiceResult = this.EntityDataService.DeleteRange(ids, dbModificationScope);
+
+            dbModificationScope.CommitIfSuccess(dataServiceResult.Success);
+
+            return dataServiceResult;
         }
 
         /// <inheritdoc />

@@ -43,8 +43,7 @@ namespace Data.EF.Core
                 DbSet<TEntityOrm> entityDbSet = GetEntityDbSet(modificationContext);
 
                 EntityEntry<TEntityOrm> updateResult = entityDbSet.Update(ConvertToEntityOrm(entity));
-
-                dbModificationScope.SaveChangesAndCommit(modificationContext);
+                modificationContext.SaveChanges();
 
                 TEntityIdType entityId = ConvertToEntityId(updateResult.Entity.Id);
 
@@ -70,8 +69,7 @@ namespace Data.EF.Core
                 DbSet<TEntityOrm> entityDbSet = GetEntityDbSet(modificationContext);
 
                 entityDbSet.Update(ConvertToEntityOrm(entity));
-
-                dbModificationScope.SaveChangesAndCommit(modificationContext);
+                modificationContext.SaveChanges();
 
                 result = OperationResult.Ok();
             }
@@ -94,9 +92,10 @@ namespace Data.EF.Core
                 TDbContext modificationContext = GetModificationContext(dbModificationScope);
                 DbSet<TEntityOrm> entityDbSet = GetEntityDbSet(modificationContext);
 
-                entityDbSet.Remove(new TEntityOrm { Id = ConvertToEntityOrmId(id) });
+                TEntityOrm entityOrm = entityDbSet.Find(id);
 
-                dbModificationScope.SaveChangesAndCommit(modificationContext);
+                entityDbSet.Remove(entityOrm);
+                modificationContext.SaveChanges();
 
                 result = OperationResult.Ok();
             }
@@ -124,11 +123,10 @@ namespace Data.EF.Core
                 TDbContext modificationContext = GetModificationContext(dbModificationScope);
                 DbSet<TEntityOrm> entityDbSet = GetEntityDbSet(modificationContext);
 
-                IEnumerable<TEntityOrm> entities = ids.Select(id => new TEntityOrm { Id = ConvertToEntityOrmId(id) });
+                IEnumerable<TEntityOrm> entities = entityDbSet.Where(x => ids.Select(ConvertToEntityOrmId).Contains(x.Id));
 
                 entityDbSet.RemoveRange(entities);
-
-                dbModificationScope.SaveChangesAndCommit(modificationContext);
+                modificationContext.SaveChanges();
 
                 result = OperationResult.Ok();
             }

@@ -9,6 +9,9 @@ namespace Infrastructure.Shared.Entities
         public TEntityIdType Id { get; set; }
 
         /// <inheritdoc />
+        public byte[] RowVersion { get; set; }
+
+        /// <inheritdoc />
         public DateTime CreatedDateTimeUtc { get; set; }
 
         /// <inheritdoc />

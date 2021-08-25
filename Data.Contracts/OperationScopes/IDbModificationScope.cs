@@ -11,6 +11,10 @@ namespace Data.Contracts.OperationScopes
 
         Task CommitAsync();
 
+        void CommitIfSuccess(bool success);
+
+        Task CommitIfSuccessAsync(bool success);
+
         void SaveChangesAndCommit<TDbContext>(TDbContext dbContext) where TDbContext : DbContext;
 
         Task SaveChangesAndCommitAsync<TDbContext>(TDbContext dbContext, CancellationToken cancellationToken) where TDbContext : DbContext;

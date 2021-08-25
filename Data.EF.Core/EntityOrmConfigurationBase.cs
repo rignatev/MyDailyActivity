@@ -21,6 +21,7 @@ namespace Data.EF.Core
             builder.Property(x => x.Id).IsRequired().ValueGeneratedOnAdd().HasColumnType("INTEGER");
             builder.Property(x => x.CreatedDateTimeUtc).IsRequired().HasColumnType("DATETIME");
             builder.Property(x => x.ModifiedDateTimeUtc).HasColumnType("DATETIME");
+            builder.Property(x => x.RowVersion).IsRowVersion();
 
             ConfigureCore(builder);
         }

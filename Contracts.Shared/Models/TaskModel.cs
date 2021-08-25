@@ -18,6 +18,7 @@ namespace Contracts.Shared.Models
             new TaskModel
             {
                 Id = default,
+                RowVersion = null,
                 CreatedDateTimeUtc = createdDateTimeUtc ?? DateTime.UtcNow,
                 ModifiedDateTimeUtc = null,
                 Name = this.Name,
@@ -30,6 +31,7 @@ namespace Contracts.Shared.Models
             new TaskModel
             {
                 Id = this.Id,
+                RowVersion = this.RowVersion,
                 CreatedDateTimeUtc = this.CreatedDateTimeUtc,
                 ModifiedDateTimeUtc = modifiedDateTimeUtc ?? DateTime.UtcNow,
                 Name = this.Name,

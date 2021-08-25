@@ -12,6 +12,7 @@ namespace Data.EF.Core.Utils
             new()
             {
                 Id = convertToProjectId(projectOrm.Id),
+                RowVersion = projectOrm.RowVersion,
                 CreatedDateTimeUtc = projectOrm.CreatedDateTimeUtc,
                 ModifiedDateTimeUtc = projectOrm.ModifiedDateTimeUtc,
                 Name = projectOrm.Name,

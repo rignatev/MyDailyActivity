@@ -22,6 +22,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\Data.EF.Core\Data.EF.Core.csproj" />
       <ProjectReference Include="..\Data.Migrations\Data.Migrations.csproj" />
     </ItemGroup>
 

@@ -12,6 +12,7 @@ namespace Data.EF.Core.Utils
             new()
             {
                 Id = convertToTaskId(taskOrm.Id),
+                RowVersion = taskOrm.RowVersion,
                 CreatedDateTimeUtc = taskOrm.CreatedDateTimeUtc,
                 ModifiedDateTimeUtc = taskOrm.ModifiedDateTimeUtc,
                 Name = taskOrm.Name,
