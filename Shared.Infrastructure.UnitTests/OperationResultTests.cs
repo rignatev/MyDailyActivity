@@ -40,7 +40,7 @@ namespace Shared.InfrastructureTests
             operationResult.Failure.Should().BeTrue();
             operationResult.Error.Should().NotBeNull();
             operationResult.Error.Message.Should().NotBeNullOrEmpty();
-            operationResult.Error.Message.Should().IsSameOrEqualTo(TestErrorMessage);
+            operationResult.Error.Message.Should().BeEquivalentTo(TestErrorMessage);
             operationResult.Error.Exception.Should().BeNull();
         }
 
@@ -58,9 +58,9 @@ namespace Shared.InfrastructureTests
             operationResult.Error.Should().NotBeNull();
             operationResult.Error.IsExceptionalError.Should().BeTrue();
             operationResult.Error.Message.Should().NotBeNullOrEmpty();
-            operationResult.Error.Message.Should().IsSameOrEqualTo(TestErrorMessage);
+            operationResult.Error.Message.Should().BeEquivalentTo(TestErrorMessage);
             operationResult.Error.Exception.Should().NotBeNull();
-            operationResult.Error.Exception.Should().IsSameOrEqualTo(exception);
+            operationResult.Error.Exception.Should().BeEquivalentTo(exception);
         }
 
         [Fact]
@@ -73,7 +73,7 @@ namespace Shared.InfrastructureTests
             operationResult.Success.Should().BeTrue();
             operationResult.Failure.Should().BeFalse();
             operationResult.Error.Should().BeNull();
-            operationResult.Value.Should().IsSameOrEqualTo(TestResultValue);
+            operationResult.Value.Should().Be(TestResultValue);
         }
 
         [Fact]
@@ -86,10 +86,10 @@ namespace Shared.InfrastructureTests
 
             operationResult.Success.Should().BeFalse();
             operationResult.Failure.Should().BeTrue();
-            operationResult.Value.Should().IsSameOrEqualTo(expected: default);
+            operationResult.Value.Should().Be(expected: default);
             operationResult.Error.Should().NotBeNull();
             operationResult.Error.Message.Should().NotBeNullOrEmpty();
-            operationResult.Error.Message.Should().IsSameOrEqualTo(TestErrorMessage);
+            operationResult.Error.Message.Should().BeEquivalentTo(TestErrorMessage);
             operationResult.Error.Exception.Should().BeNull();
         }
 
@@ -104,14 +104,14 @@ namespace Shared.InfrastructureTests
             OperationResult<int> operationResult = OperationResult<int>.Fail(operationError);
 
             operationResult.Success.Should().BeFalse();
-            operationResult.Value.Should().IsSameOrEqualTo(expected: default);
+            operationResult.Value.Should().Be(expected: default);
             operationResult.Failure.Should().BeTrue();
             operationResult.Error.Should().NotBeNull();
             operationResult.Error.IsExceptionalError.Should().BeTrue();
             operationResult.Error.Message.Should().NotBeNullOrEmpty();
-            operationResult.Error.Message.Should().IsSameOrEqualTo(TestErrorMessage);
+            operationResult.Error.Message.Should().BeEquivalentTo(TestErrorMessage);
             operationResult.Error.Exception.Should().NotBeNull();
-            operationResult.Error.Exception.Should().IsSameOrEqualTo(exception);
+            operationResult.Error.Exception.Should().BeEquivalentTo(exception);
         }
 
         [Fact]
@@ -122,7 +122,7 @@ namespace Shared.InfrastructureTests
             OperationResult<int, int> operationResult = OperationResult<int, int>.Ok(TestResultValue);
 
             operationResult.Success.Should().BeTrue();
-            operationResult.Value.Should().IsSameOrEqualTo(TestResultValue);
+            operationResult.Value.Should().Be(TestResultValue);
             operationResult.Failure.Should().BeFalse();
             operationResult.Error.Should().BeNull();
         }
@@ -136,12 +136,12 @@ namespace Shared.InfrastructureTests
             OperationResult<int, int> operationResult = OperationResult<int, int>.Fail(operationError);
 
             operationResult.Success.Should().BeFalse();
-            operationResult.Value.Should().IsSameOrEqualTo(expected: default);
+            operationResult.Value.Should().Be(expected: default);
             operationResult.Failure.Should().BeTrue();
             operationResult.Error.Should().NotBeNull();
-            operationResult.Error.Value.Should().IsSameOrEqualTo(TestErrorValue);
+            operationResult.Error.Value.Should().Be(TestErrorValue);
             operationResult.Error.Message.Should().NotBeNullOrEmpty();
-            operationResult.Error.Message.Should().IsSameOrEqualTo(TestErrorMessage);
+            operationResult.Error.Message.Should().BeEquivalentTo(TestErrorMessage);
             operationResult.Error.Exception.Should().BeNull();
         }
 
@@ -155,15 +155,15 @@ namespace Shared.InfrastructureTests
             OperationResult<int, int> operationResult = OperationResult<int, int>.Fail(operationError);
 
             operationResult.Success.Should().BeFalse();
-            operationResult.Value.Should().IsSameOrEqualTo(expected: default);
+            operationResult.Value.Should().Be(expected: default);
             operationResult.Failure.Should().BeTrue();
             operationResult.Error.Should().NotBeNull();
-            operationResult.Error.Value.Should().IsSameOrEqualTo(TestErrorValue);
+            operationResult.Error.Value.Should().Be(TestErrorValue);
             operationResult.Error.IsExceptionalError.Should().BeTrue();
             operationResult.Error.Message.Should().NotBeNullOrEmpty();
-            operationResult.Error.Message.Should().IsSameOrEqualTo(TestErrorMessage);
+            operationResult.Error.Message.Should().BeEquivalentTo(TestErrorMessage);
             operationResult.Error.Exception.Should().NotBeNull();
-            operationResult.Error.Exception.Should().IsSameOrEqualTo(exception);
+            operationResult.Error.Exception.Should().BeEquivalentTo(exception);
         }
     }
 }
